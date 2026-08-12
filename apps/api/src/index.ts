@@ -13,13 +13,23 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "oracle-chester-pipeline", ts: new Date().toISOString() });
 });
 
+function requireStore(res: express.Response, store: Awaited<ReturnType<typeof loadStore>>) {
+  if (store.source === "missing") {
+    res.status(503).json({ error: "pipeline artifacts not found" });
+    return false;
+  }
+  return true;
+}
+
 app.get("/api/run", async (_req, res) => {
   const store = await loadStore();
-  res.json(store.run ?? { error: "pipeline not run yet" });
+  if (!requireStore(res, store)) return;
+  res.json(store.run);
 });
 
 app.get("/api/counts", async (_req, res) => {
   const store = await loadStore();
+  if (!requireStore(res, store)) return;
   res.json({
     properties: store.properties.length,
     permits: store.permits.length,
@@ -36,6 +46,7 @@ app.get("/api/ipfs", async (_req, res) => {
 
 app.post("/api/query", async (req, res) => {
   const store = await loadStore();
+  if (!requireStore(res, store)) return;
   const lat = Number(req.body.lat ?? 39.9607);
   const lng = Number(req.body.lng ?? -75.6055);
   const radiusMiles = Number(req.body.radiusMiles ?? 5);
@@ -56,6 +67,7 @@ app.post("/api/query", async (req, res) => {
 app.post("/api/agent", async (req, res) => {
   const question = String(req.body.question ?? "");
   const store = await loadStore();
+  if (!requireStore(res, store)) return;
   const lat = Number(req.body.lat ?? 39.9607);
   const lng = Number(req.body.lng ?? -75.6055);
   const parsed = parseAgentQuestion(question, lat, lng);
@@ -64,7 +76,7 @@ app.post("/api/agent", async (req, res) => {
   res.json({
     question,
     assumptions: args,
-    caveats: agentCaveats(askedRoofingUcc),
+    caveats: agentCaveats(askedRoofingUcc, Boolean(args.minRoofAgeYears)),
     answer: `${rows.length} matching properties near West Chester (Chester County, PA).`,
     evidence: rows.slice(0, 15).map((r) => ({
       address: r.property.address,
@@ -99,7 +111,9 @@ app.get("/mcp/tools", (_req, res) => {
             lng: { type: "number" },
             radiusMiles: { type: "number" },
             minRoofAgeYears: { type: "number" },
+            openPermitsOnly: { type: "boolean" },
             openRoofingOnly: { type: "boolean" },
+            minOpenDays: { type: "number" },
           },
         },
       },
@@ -118,23 +132,47 @@ app.post("/mcp/call", async (req, res) => {
       lng: Number(req.body.arguments?.lng ?? -75.6055),
       radiusMiles: Number(req.body.arguments?.radiusMiles ?? 5),
       minRoofAgeYears: req.body.arguments?.minRoofAgeYears,
+      openPermitsOnly: Boolean(req.body.arguments?.openPermitsOnly),
       openRoofingOnly: Boolean(req.body.arguments?.openRoofingOnly),
+      minOpenDays: req.body.arguments?.minOpenDays,
     });
     return res.json({ result: { count: rows.length, results: rows.slice(0, 100) } });
   }
   res.status(400).json({ error: `unknown tool ${name}` });
 });
 
-app.post("/api/pipeline/run", async (_req, res) => {
+let pipelineLock = false;
+
+app.post("/api/pipeline/run", async (req, res) => {
+  const token = process.env.PIPELINE_TOKEN;
+  const remote = req.socket.remoteAddress ?? "";
+  const local = remote === "127.0.0.1" || remote === "::1" || remote.endsWith("127.0.0.1");
+  if (token) {
+    if (req.get("x-pipeline-token") !== token) {
+      res.status(401).json({ error: "unauthorized" });
+      return;
+    }
+  } else if (!local) {
+    res.status(403).json({ error: "pipeline run is local-only" });
+    return;
+  }
+  if (pipelineLock) {
+    res.status(409).json({ error: "pipeline already running" });
+    return;
+  }
+  pipelineLock = true;
   try {
     const run = await runPipeline();
     res.json(run);
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
+  } catch {
+    res.status(500).json({ error: "pipeline failed" });
+  } finally {
+    pipelineLock = false;
   }
 });
 
 const port = Number(process.env.PORT ?? 8080);
-app.listen(port, () => {
-  console.log(`oracle-chester listening on :${port}`);
+const host = process.env.HOST ?? "127.0.0.1";
+app.listen(port, host, () => {
+  console.log(`oracle-chester listening on ${host}:${port}`);
 });

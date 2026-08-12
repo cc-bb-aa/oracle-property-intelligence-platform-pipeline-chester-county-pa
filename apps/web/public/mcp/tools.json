@@ -23,6 +23,9 @@
           },
           "openRoofingOnly": {
             "type": "boolean"
+          },
+          "minOpenDays": {
+            "type": "number"
           }
         }
       }
@@ -36,7 +39,7 @@
   "counts": {
     "properties": 2493,
     "permits": 952,
-    "contractors": 714,
+    "contractors": 356,
     "businesses": 89,
     "rawPasdaFeatures": 2500
   },

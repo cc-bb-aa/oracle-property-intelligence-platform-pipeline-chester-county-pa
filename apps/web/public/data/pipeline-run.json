@@ -11,7 +11,7 @@
       "isFallback": false,
       "records": 2493,
       "sourceUrl": "https://mapservices.pasda.psu.edu/server/rest/services/pasda/ChesterCounty/MapServer/11",
-      "limitations": "West Chester 5mi slice (INGEST_MODE=west-chester-slice). Full county: INGEST_MODE=full."
+      "limitations": "West Chester 5mi envelope, capped at 2500 PASDA rows (OBJECTID page, not a complete 5-mile census). INGEST_MODE=full for the county."
     },
     {
       "dataset": "permits",
@@ -52,7 +52,7 @@
   "counts": {
     "properties": 2493,
     "permits": 952,
-    "contractors": 714,
+    "contractors": 356,
     "businesses": 89,
     "rawPasdaFeatures": 2500
   },
@@ -74,7 +74,7 @@
       "cid": "QmVmZ6CN3Gp9htMra4RKFZiaAgizZDe6BpJfNkSWVvAKjL"
     }
   ],
-  "duckdbPath": "/Users/it/dev/prism-homework/forks/oracle-property-intelligence-platform-pipeline-chester-county-pa/data/duckdb/chester.duckdb",
+  "duckdbPath": "data/duckdb/chester.duckdb",
   "limitations": [
     "Harvested 952 real Chester County GIS permits (health well/sewage, Act 247 land-dev/subdivision, EnerGov PermitManagement). Municipal building/roofing UCC (Evolve / West Chester SmartGov) is account- or form-walled and was not synthesized. isRoofing is keyword-tagged only; most records are county health or planning cases.",
     "Year built not on PASDA parcel layer; roof age uses last roofing permit when present.",

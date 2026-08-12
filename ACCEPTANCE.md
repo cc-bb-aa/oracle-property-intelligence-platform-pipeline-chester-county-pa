@@ -16,7 +16,7 @@
 | D9 | Reconcile duplicates | reconcileProperties unit | done |
 | D10 | Provenance | provenance on every record | in progress |
 | I1 | No default ongoing Oracle infra cost | DuckDB file + content-addressed artifacts + scale-to-zero host | in progress |
-| I2 | IPFS / content ids | ipfs-only-hash CID + Filebase pin when FILEBASE_* set | done |
+| I2 | IPFS / content ids | local CIDv0 via ipfs-only-hash (no Filebase pin client) | done |
 | I3 | DuckDB query | writeDuckDb + JSON fallback | in progress |
 | I4 | MCP-ready | `/mcp/tools` `/mcp/call` | in progress |
 | I5 | Agent access | `/api/agent` | in progress |

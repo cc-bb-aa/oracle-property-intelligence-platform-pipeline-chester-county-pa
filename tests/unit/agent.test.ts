@@ -24,4 +24,13 @@ describe("parseAgentQuestion", () => {
     assert.equal(q.minRoofAgeYears, undefined);
     assert.match(agentCaveats(true).join(" "), /not in the public harvest/);
   });
+
+  it("parses the official five-year open-permit prompt", () => {
+    const q = parseAgentQuestion(
+      "show me open roofing permits older than five years within five miles of West Chester",
+    );
+    assert.equal(q.openPermitsOnly, true);
+    assert.equal(q.minOpenDays, 365 * 5);
+    assert.equal(q.minRoofAgeYears, undefined);
+  });
 });

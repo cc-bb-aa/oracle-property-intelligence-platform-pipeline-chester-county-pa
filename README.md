@@ -25,7 +25,7 @@ npm start           # http://127.0.0.1:8080
 
 ### Hosted cost model
 
-Artifacts are JSON + optional DuckDB file. Publish writes CIDv0 via `ipfs-only-hash`. Set `FILEBASE_ACCESS_KEY` / `FILEBASE_SECRET_KEY` / `FILEBASE_BUCKET` to pin the same objects to Filebase. The API is stateless over those files so the host can scale to zero. No always-on Oracle warehouse.
+Artifacts are JSON + optional DuckDB file. Publish writes a local CIDv0 via `ipfs-only-hash`. There is no Filebase pin client in this tree. The API is stateless over those files so the host can scale to zero. `POST /api/pipeline/run` binds `127.0.0.1` unless `HOST` is set. No always-on Oracle warehouse.
 
 ## Context
 

@@ -1,5 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { esriIso } from "../../packages/pipeline/src/lib/gis.ts";
 import {
   looksRoofing,
   mapPermitStatus,
@@ -97,5 +98,11 @@ describe("permit harvest mappers", () => {
     assert.equal(permit.isRoofing, false);
     assert.equal(permit.provenance.sourceId, "chesco-act247-gis");
     assert.match(permit.permitType, /Act 247/);
+    assert.equal(permit.contractorName, null);
+  });
+
+  it("rejects EnerGov sentinel years", () => {
+    assert.equal(esriIso("2999-01-01T00:00:00.000Z"), null);
+    assert.ok(esriIso("2017-01-03T00:00:00.000Z"));
   });
 });

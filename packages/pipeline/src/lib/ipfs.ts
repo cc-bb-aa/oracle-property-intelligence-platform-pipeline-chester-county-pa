@@ -19,11 +19,11 @@ export async function publishArtifact(
     cid = `sha256-${createHash("sha256").update(bytes).digest("hex")}`;
   }
   await mkdir(dirname(destManifest), { recursive: true });
-  // ponytail: Filebase pin is `aws s3 cp` to s3.filebase.io when FILEBASE_* exists
+  const pin = cid.startsWith("sha256-") ? "sha256-fallback" : "ipfs-only-hash-local";
   await writeFile(
     destManifest,
     JSON.stringify(
-      { artifact: artifactName, path: filePath, cid, bytes: bytes.length, pin: "ipfs-only-hash" },
+      { artifact: artifactName, path: artifactName, cid, bytes: bytes.length, pin },
       null,
       2,
     ),

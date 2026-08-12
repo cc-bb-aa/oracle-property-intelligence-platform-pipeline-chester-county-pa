@@ -35,7 +35,7 @@ export function parseAgentQuestion(
   };
 }
 
-export function agentCaveats(askedRoofingUcc: boolean): string[] {
+export function agentCaveats(askedRoofingUcc: boolean, askedAgedRoof = false): string[] {
   const caveats = [
     "Municipal building/roofing UCC (Evolve / West Chester SmartGov) is not in the public harvest.",
     "Open-permit results are Chester County Act 247 / EnerGov / health GIS, not municipal roofing permits.",
@@ -43,6 +43,11 @@ export function agentCaveats(askedRoofingUcc: boolean): string[] {
   if (askedRoofingUcc) {
     caveats.push(
       "isRoofing is keyword-tagged only; this harvest has no roofing-tagged rows. Showing long-open county permits instead.",
+    );
+  }
+  if (askedAgedRoof) {
+    caveats.push(
+      "PASDA has no year_built. roofAgeYears is a closed roofing-tagged permit only. Aged-roof matches may use constructionAgeYears (last land-dev/construction), which is not a roof age.",
     );
   }
   return caveats;

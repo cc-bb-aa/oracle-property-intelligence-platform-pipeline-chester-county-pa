@@ -37,8 +37,10 @@ export function transformParcel(f: PasdaFeature): Property | null {
     propertyId: `chester:${upi}`,
     upi,
     address,
-    city: cityFromPasda(a.ADDR2, mailing),
-    zip: siteZip ?? mailingZip,
+    city: undefined,
+    zip: siteZip,
+    mailingCity: cityFromPasda(a.ADDR2, mailing),
+    mailingZip,
     ownerName: ownerName || undefined,
     ownerMailing: mailing || undefined,
     lat: c.lat,
@@ -78,12 +80,14 @@ export function applyRoofingPermitAge(p: Property, permits: Permit[]): Property 
     .at(-1);
   const { age, basis } = roofAgeYears({
     yearBuilt: p.yearBuilt,
-    lastRoofingCompletedAt: roofingDone ?? constructionDone ?? null,
+    lastRoofingCompletedAt: roofingDone ?? null,
   });
+  const constructionAge = constructionDone ? yearsSince(constructionDone) : null;
   return {
     ...p,
     roofAgeYears: age,
-    roofAgeBasis: roofingDone ? basis : constructionDone ? "last_construction_permit" : basis,
+    roofAgeBasis: basis,
+    constructionAgeYears: constructionAge != null ? Math.floor(constructionAge) : null,
   };
 }
 

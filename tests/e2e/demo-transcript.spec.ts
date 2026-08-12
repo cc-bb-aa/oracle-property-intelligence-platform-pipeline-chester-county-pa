@@ -14,8 +14,11 @@ test("demo transcript surfaces exist", async ({ page }) => {
 test("radius query returns aged roofs", async ({ page }) => {
   await page.goto("./");
   await expect(page.locator("#run")).not.toHaveText("loading…", { timeout: 30_000 });
+  await page.locator("#aged").check();
   await page.getByRole("button", { name: "Query" }).click();
   await expect(page.locator("#table")).toContainText("matches", { timeout: 30_000 });
+  await expect(page.locator("#table")).not.toHaveText(/^0 matches/);
+  await expect(page.locator("#table")).toContainText(/land-dev|roof/i);
 });
 
 test("agent question returns evidence", async ({ page }) => {
@@ -23,6 +26,7 @@ test("agent question returns evidence", async ({ page }) => {
   await expect(page.locator("#run")).not.toHaveText("loading…", { timeout: 30_000 });
   await page.getByRole("button", { name: "Ask agent" }).click();
   await expect(page.locator("#agent")).toContainText("matching properties", { timeout: 30_000 });
+  await expect(page.locator("#agent")).not.toHaveText(/0 matching properties/);
 });
 
 test("open-roofing agent returns county permits and a UCC caveat", async ({ page }) => {

@@ -1,5 +1,11 @@
 const $ = (id) => document.getElementById(id);
 
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (ch) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch],
+  );
+}
+
 /** Keep in sync with packages/shared/src/agent.ts */
 function parseAgentQuestion(question, lat, lng) {
   const q = question.toLowerCase();
@@ -36,6 +42,10 @@ function agentCaveats(askedRoofingUcc) {
     );
   }
   return caveats;
+}
+
+function agedRoofCaveat() {
+  return "PASDA has no year_built. roofAgeYears is a closed roofing-tagged permit only. Aged-roof matches may use constructionAgeYears (last land-dev/construction), which is not a roof age.";
 }
 
 function miles(lat1, lng1, lat2, lng2) {
@@ -78,11 +88,12 @@ function queryLocal(q) {
       permits: byProp.get(p.propertyId) ?? [],
     }))
     .filter((row) => row.miles <= q.radiusMiles)
-    .filter((row) =>
-      q.minRoofAgeYears == null
-        ? true
-        : row.property.roofAgeYears != null && row.property.roofAgeYears >= q.minRoofAgeYears,
-    )
+    .filter((row) => {
+      if (q.minRoofAgeYears == null) return true;
+      const roof = row.property.roofAgeYears;
+      const proxy = row.property.constructionAgeYears;
+      return (roof != null && roof >= q.minRoofAgeYears) || (proxy != null && proxy >= q.minRoofAgeYears);
+    })
     .filter((row) => {
       if (!q.openRoofingOnly && !q.openPermitsOnly) return true;
       return row.permits.some((x) => {
@@ -114,13 +125,26 @@ function renderCoverage(run) {
   const rows = (run.coverage || [])
     .map(
       (c) =>
-        `<tr><td>${c.dataset}</td><td>${c.county}${c.isFallback ? " (fallback)" : ""}</td><td>${c.records}</td><td>${c.limitations || c.sourceUrl || ""}</td></tr>`,
+        `<tr><td>${esc(c.dataset)}</td><td>${esc(c.county)}${c.isFallback ? " (fallback)" : ""}</td><td>${esc(c.records)}</td><td>${esc(c.limitations || c.sourceUrl || "")}</td></tr>`,
     )
     .join("");
-  $("coverage").innerHTML = `<p>Primary <strong>${run.primaryCounty}</strong>. Fallbacks attempted: ${
-    (run.fallbacksAttempted || []).join(", ") || "none (Montgomery / Delaware / Bucks unused)"
-  }. Run ${run.runId} · ${run.startedAt} → ${run.finishedAt}</p>
+  $("coverage").innerHTML = `<p>Primary <strong>${esc(run.primaryCounty)}</strong>. Fallbacks attempted: ${
+    esc((run.fallbacksAttempted || []).join(", ") || "none (Montgomery / Delaware / Bucks unused)")
+  }. Run ${esc(run.runId)} · ${esc(run.startedAt)} → ${esc(run.finishedAt)}</p>
     <table><thead><tr><th>Dataset</th><th>County</th><th>Records</th><th>Limitations / source</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderKpis() {
+  if (!$("kpis")) return;
+  const open = store.permits.filter((p) => p.status === "open").length;
+  $("kpis").innerHTML = [
+    ["Properties", store.properties.length],
+    ["Permits", store.permits.length],
+    ["Open", open],
+    ["Contractors", store.contractors.length],
+  ]
+    .map(([label, n]) => `<div class="kpi"><b>${n}</b><span>${label}</span></div>`)
+    .join("");
 }
 
 function renderBySource() {
@@ -148,7 +172,13 @@ async function refresh() {
     $("ipfs").textContent = JSON.stringify(await tryFetch("/api/ipfs"), null, 2);
     if (!store.properties.length) await loadStatic();
   } catch {
-    await loadStatic();
+    try {
+      await loadStatic();
+    } catch (err) {
+      $("run").textContent = `Failed to load Chester artifacts: ${err}`;
+      if ($("coverage")) $("coverage").textContent = "Published JSON did not load.";
+      return;
+    }
     $("run").textContent = JSON.stringify(store.run, null, 2);
     $("counts").textContent = JSON.stringify({
       properties: store.properties.length,
@@ -163,6 +193,7 @@ async function refresh() {
   }
   renderCoverage(store.run);
   renderBySource();
+  renderKpis();
   try {
     $("mcp").textContent = JSON.stringify(await tryFetch("./mcp/tools.json"), null, 2);
   } catch {
@@ -176,12 +207,17 @@ function renderTable(data) {
       const bbb = (r.contractors || [])
         .map((c) => `${c.name} BBB ${c.bbbRating ?? c.bbbScore ?? "n/a"}`)
         .join("; ");
+      const roof = r.property.roofAgeYears != null
+        ? `${r.property.roofAgeYears} (${r.property.roofAgeBasis})`
+        : r.property.constructionAgeYears != null
+          ? `land-dev ${r.property.constructionAgeYears}y (not roof)`
+          : "—";
       return `<tr>
-        <td>${r.property.address}<br><small>${r.property.upi} · ${r.miles.toFixed(2)} mi · ${r.property.lat.toFixed(4)}, ${r.property.lng.toFixed(4)}</small></td>
-        <td>${r.property.roofAgeYears ?? "—"} (${r.property.roofAgeBasis})</td>
-        <td>${(r.permits || []).map((p) => `${p.status} ${p.openDurationDays ?? ""}d ${p.contractorName ?? ""}`).join("<br>")}</td>
-        <td>${bbb || "BBB n/a"}</td>
-        <td>${r.property.provenance.sourceId}</td>
+        <td>${esc(r.property.address)}<br><small>${esc(r.property.upi)} · ${r.miles.toFixed(2)} mi · ${r.property.lat.toFixed(4)}, ${r.property.lng.toFixed(4)}</small></td>
+        <td>${esc(roof)}</td>
+        <td>${(r.permits || []).map((p) => `${esc(p.status)} ${esc(p.openDurationDays ?? "")}d ${esc(p.contractorName ?? "")}`).join("<br>")}</td>
+        <td>${esc(bbb || "BBB n/a")}</td>
+        <td>${esc(r.property.provenance.sourceId)}</td>
       </tr>`;
     })
     .join("");
@@ -212,7 +248,7 @@ $("query").onclick = async () => {
     minRoofAgeYears: $("aged").checked ? 15 : undefined,
     openPermitsOnly: $("open").checked,
     openRoofingOnly: $("roofing")?.checked,
-    minOpenDays: $("open").checked ? 365 : undefined,
+    minOpenDays: $("longOpen")?.checked ? 365 : undefined,
   };
   try {
     const data = await tryFetch("/api/query", {
@@ -251,7 +287,10 @@ $("ask").onclick = async () => {
           openRoofingOnly: parsed.openRoofingOnly,
           minOpenDays: parsed.minOpenDays,
         },
-        caveats: agentCaveats(parsed.askedRoofingUcc),
+        caveats: [
+          ...agentCaveats(parsed.askedRoofingUcc),
+          ...(parsed.minRoofAgeYears ? [agedRoofCaveat()] : []),
+        ],
         answer: `${data.count} matching properties near West Chester (Chester County, PA).`,
         evidence: data.results.slice(0, 15).map((r) => ({
           address: r.property.address,

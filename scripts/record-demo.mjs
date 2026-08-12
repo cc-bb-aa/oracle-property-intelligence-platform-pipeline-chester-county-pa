@@ -20,7 +20,7 @@ async function say(text, ms = 2800) {
       el = document.createElement("div");
       el.id = "demo-caption";
       el.style.cssText =
-        "position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#1c2b24;color:#f4f1ea;padding:12px 16px;border-radius:8px;font:15px/1.4 ui-sans-serif,system-ui;box-shadow:0 8px 24px #0008";
+        "position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#1e2a33;color:#e8eef1;padding:12px 16px;border-radius:3px;font:15px/1.4 'IBM Plex Sans',ui-sans-serif,system-ui;box-shadow:0 8px 24px #0008;border-left:4px solid #a85b2a";
       document.body.appendChild(el);
     }
     el.textContent = t;

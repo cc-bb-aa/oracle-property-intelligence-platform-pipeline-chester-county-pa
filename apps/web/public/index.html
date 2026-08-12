@@ -4,43 +4,270 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Oracle · Chester County, PA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    :root { font-family: ui-sans-serif, system-ui, sans-serif; color: #122; background: #f4f1ea; }
-    body { margin: 0; }
-    header { padding: 1rem 1.25rem; background: #1c2b24; color: #f4f1ea; }
-    header p { margin: 0.25rem 0 0; opacity: 0.8; font-size: 0.9rem; }
-    main { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; }
-    section { background: #fff; border: 1px solid #d7d0c4; border-radius: 10px; padding: 0.9rem; }
-    h2 { margin: 0 0 0.6rem; font-size: 1rem; }
-    pre { background: #111; color: #d6f5c8; padding: 0.7rem; overflow: auto; max-height: 280px; font-size: 12px; }
-    label { display: block; font-size: 0.8rem; margin: 0.35rem 0; }
-    input, button, textarea { font: inherit; }
-    button { background: #1c2b24; color: #fff; border: 0; border-radius: 6px; padding: 0.45rem 0.7rem; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    td, th { border-bottom: 1px solid #eee; text-align: left; padding: 0.3rem; vertical-align: top; }
-    .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+    :root {
+      --ink: #1a2430;
+      --paper: #f3f5f6;
+      --mylar: #d7dee4;
+      --surface: #fbfcfc;
+      --muted: #5b6772;
+      --line: #c5ced6;
+      --tray: #1e2a33;
+      --tray-ink: #e8eef1;
+      --tray-dim: #9aadb8;
+      --copper: #a85b2a;
+      --copper-press: #8c4b22;
+      --plat: #2c5874;
+      --stamp: #8b2e2e;
+      --space-md: 8px;
+      --space-lg: 12px;
+      --space-xl: 16px;
+      --space-2xl: 24px;
+      --r: 3px;
+      --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+      --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      align-items: flex-end;
+      padding: var(--space-xl) var(--space-2xl);
+      background: var(--tray);
+      color: var(--tray-ink);
+      border-bottom: 6px solid transparent;
+      background-image:
+        repeating-linear-gradient(
+          to right,
+          transparent 0 10px,
+          #c9b07a 10px 12px,
+          transparent 12px 22px
+        );
+      background-size: 100% 6px;
+      background-repeat: no-repeat;
+      background-position: left bottom;
+    }
+    .kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tray-dim);
+    }
+    h1 {
+      margin: 2px 0 0;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 0.95;
+      text-wrap: balance;
+    }
+    header > div > p:last-child {
+      margin: 6px 0 0;
+      max-width: 42rem;
+      color: #c5d0d6;
+      font-size: 0.9rem;
+      text-wrap: pretty;
+    }
+    details.dump {
+      margin-top: var(--space-md);
+    }
+    details.dump summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    #table { overflow: auto; max-height: 360px; }
+    #coverage, #bySource { overflow: auto; }
+    .kpis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      align-items: stretch;
+    }
+    .kpi {
+      min-width: 104px;
+      padding: 8px 12px;
+      background: #162028;
+      border: 1px solid #3a4a55;
+      border-radius: var(--r);
+    }
+    .kpi b {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi span {
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--tray-dim);
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      padding: var(--space-xl);
+    }
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: var(--space-lg);
+    }
+    h2 {
+      margin: 0 0 var(--space-md);
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    p { text-wrap: pretty; }
+    pre {
+      margin: var(--space-md) 0 0;
+      padding: var(--space-md);
+      max-height: 280px;
+      overflow: auto;
+      background: var(--tray);
+      color: #d7e3ea;
+      border-radius: var(--r);
+      font: 12px/1.45 var(--font-mono);
+    }
+    label {
+      display: block;
+      margin: 0.35rem 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    input[type="text"], input:not([type]), input[type="number"], textarea {
+      width: 100%;
+      max-width: 16rem;
+      min-height: 40px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: #fff;
+      color: var(--ink);
+      font: 500 16px/1.3 var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+    textarea { max-width: none; font-family: var(--font-body); font-size: 14px; }
+    label:has([type="checkbox"]) {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--ink);
+    }
+    input[type="checkbox"] { accent-color: var(--copper); width: auto; min-height: 0; }
+    button {
+      min-height: 44px;
+      margin: 4px 4px 4px 0;
+      padding: 0 14px;
+      border: 0;
+      border-radius: var(--r);
+      background: var(--copper);
+      color: #fff;
+      font: 600 0.88rem/1 var(--font-body);
+      cursor: pointer;
+      transition-property: background-color, transform;
+      transition-duration: 160ms;
+      transition-timing-function: ease-out;
+    }
+    button:hover { background: var(--copper-press); }
+    button:active { transform: scale(0.98); }
+    button.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    button.ghost:hover { background: var(--mylar); }
+    input:focus-visible, textarea:focus-visible, button:focus-visible {
+      outline: 2px solid var(--copper);
+      outline-offset: 2px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    th, td {
+      padding: 0.4rem 0.35rem;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    tbody tr:hover { background: #eef3f6; }
+    .row { display: flex; flex-wrap: wrap; gap: var(--space-md); }
+    #sec-mcp { grid-column: 1 / -1; }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; padding: var(--space-md); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      button { transition: none; }
+      button:active { transform: none; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Oracle pipeline · Chester County, PA</h1>
-    <p>DuckDB + content-addressed artifacts + MCP-ready query. Roofing lead signals for the CRM.</p>
+    <div>
+      <p class="kicker">Chester County, PA · Field Desk</p>
+      <h1>Oracle pipeline · Chester County, PA</h1>
+      <p>DuckDB + content-addressed artifacts + MCP-ready query. Roofing lead signals for the CRM.</p>
+    </div>
+    <div class="kpis" id="kpis"></div>
   </header>
   <main>
     <section id="sec-run">
       <h2>Pipeline run summary</h2>
       <div class="row">
-        <button id="reload">Reload run</button>
-        <button id="rerun" title="Requires Node API">Run pipeline</button>
+        <button id="reload" type="button">Reload run</button>
+        <button id="rerun" class="ghost" type="button" title="Requires Node API">Run pipeline</button>
       </div>
       <div id="coverage"></div>
-      <pre id="run">loading…</pre>
+      <details class="dump">
+        <summary>Raw run record</summary>
+        <pre id="run">loading…</pre>
+      </details>
     </section>
     <section id="sec-counts">
       <h2>Uploaded records by source</h2>
       <div id="bySource"></div>
-      <pre id="counts"></pre>
+      <details class="dump">
+        <summary>Raw counts</summary>
+        <pre id="counts"></pre>
+      </details>
     </section>
     <section id="sec-duckdb">
       <h2>DuckDB-backed query layer</h2>
@@ -53,23 +280,27 @@
     </section>
     <section id="sec-ipfs">
       <h2>IPFS artifacts</h2>
-      <pre id="ipfs"></pre>
+      <details class="dump" open>
+        <summary>Published CIDs</summary>
+        <pre id="ipfs"></pre>
+      </details>
     </section>
     <section id="sec-query">
       <h2>DuckDB-backed / JSON query (radius)</h2>
       <label>lat <input id="lat" value="39.9607" /></label>
       <label>lng <input id="lng" value="-75.6055" /></label>
       <label>radius miles <input id="radius" value="5" /></label>
-      <label><input type="checkbox" id="aged" /> roofs ≥ 15y (known proxy only)</label>
+      <label><input type="checkbox" id="aged" /> roofs ≥ 15y (known proxy / land-dev age)</label>
       <label><input type="checkbox" id="open" /> open county permits</label>
+      <label><input type="checkbox" id="longOpen" /> open ≥ 1 year</label>
       <label><input type="checkbox" id="roofing" /> roofing-tagged only</label>
-      <button id="query">Query</button>
+      <button id="query" type="button">Query</button>
       <div id="table"></div>
     </section>
     <section id="sec-agent">
       <h2>Agent query</h2>
-      <textarea id="q" rows="3" style="width:100%">Which properties in Chester County within five miles of West Chester have roofs older than 15 years?</textarea>
-      <button id="ask">Ask agent</button>
+      <textarea id="q" rows="3">Which properties in Chester County within five miles of West Chester have roofs older than 15 years?</textarea>
+      <button id="ask" type="button">Ask agent</button>
       <pre id="agent"></pre>
     </section>
     <section id="sec-mcp">
@@ -78,7 +309,10 @@
         Agents and the roofing CRM call the same query model
         (<code>queryProperties</code>, <code>getPipelineRun</code>) without changing the data contract.
       </p>
-      <pre id="mcp"></pre>
+      <details class="dump">
+        <summary>Tool catalog</summary>
+        <pre id="mcp"></pre>
+      </details>
     </section>
   </main>
   <script src="./app.js"></script>

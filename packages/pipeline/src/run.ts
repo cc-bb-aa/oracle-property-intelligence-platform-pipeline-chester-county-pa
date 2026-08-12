@@ -2,7 +2,7 @@ import { mkdir, writeFile, copyFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import type { PipelineRun } from "../../schema/src/index.ts";
-import { queryLayer, westChesterBbox } from "./stages/pasda.ts";
+import { countLayer, queryLayer, westChesterBbox } from "./stages/pasda.ts";
 import {
   applyRoofingPermitAge,
   businessesFromOwners,
@@ -36,8 +36,10 @@ export async function runPipeline(): Promise<PipelineRun> {
     "county-open-data-publish",
   ];
 
+  const parcelLayer = Number(process.env.PARCEL_LAYER ?? 11);
+  const envelopeCount = await countLayer({ layer: parcelLayer, geometry: geom });
   const raw = await queryLayer({
-    layer: Number(process.env.PARCEL_LAYER ?? 11),
+    layer: parcelLayer,
     geometry: geom,
     maxRecords: maxParcels,
   });
@@ -102,7 +104,9 @@ export async function runPipeline(): Promise<PipelineRun> {
         limitations:
           mode === "full"
             ? "Full PASDA layer (~194k). This run used pagination."
-            : `West Chester ${5}mi slice (INGEST_MODE=${mode}). Full county: INGEST_MODE=full.`,
+            : `West Chester 5mi envelope, capped at ${maxParcels}${
+                envelopeCount != null ? ` of ${envelopeCount}` : ""
+              } PASDA rows (OBJECTID page, not a complete 5-mile census). INGEST_MODE=full for the county.`,
       },
       {
         dataset: "permits",
@@ -148,10 +152,10 @@ export async function runPipeline(): Promise<PipelineRun> {
       rawPasdaFeatures: raw.length,
     },
     ipfs,
-    duckdbPath,
+    duckdbPath: "data/duckdb/chester.duckdb",
     limitations: [
       harvest.limitations,
-      "Year built not on PASDA parcel layer; roof age uses last roofing permit when present.",
+      "Year built not on PASDA parcel layer. roofAgeYears is year_built or a closed roofing-tagged permit only. last land-dev/construction age is constructionAgeYears (not a roof).",
       "Sunbiz not applicable in Pennsylvania.",
       "BBB scores require harvested seed; default null.",
       ...(duckLimitation ? [duckLimitation] : []),
@@ -190,6 +194,7 @@ export async function runPipeline(): Promise<PipelineRun> {
                 minRoofAgeYears: { type: "number" },
                 openPermitsOnly: { type: "boolean" },
                 openRoofingOnly: { type: "boolean" },
+                minOpenDays: { type: "number" },
               },
             },
           },

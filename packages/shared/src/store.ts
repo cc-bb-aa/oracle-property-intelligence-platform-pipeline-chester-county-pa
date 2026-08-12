@@ -7,8 +7,14 @@ import {
   type Permit,
   type PipelineRun,
   type Property,
+  BusinessSchema,
+  ContractorSchema,
+  PermitSchema,
+  PipelineRunSchema,
+  PropertySchema,
   haversineMiles,
 } from "../../schema/src/index.ts";
+import { z } from "zod";
 
 export type Store = {
   run: PipelineRun | null;
@@ -16,26 +22,34 @@ export type Store = {
   permits: Permit[];
   contractors: Contractor[];
   businesses: Business[];
+  source: "artifacts" | "missing";
 };
 
 const root = () => resolve(process.env.ORACLE_ROOT ?? process.cwd());
 
-async function loadJson<T>(rel: string, fallback: T): Promise<T> {
+async function loadJson<T>(rel: string, fallback: T, schema?: z.ZodType<T>): Promise<T> {
   const candidates = [resolve(root(), rel), resolve(root(), rel.replace("data/artifacts/", "apps/web/public/data/"))];
   for (const p of candidates) {
     if (!existsSync(p)) continue;
-    return JSON.parse(await readFile(p, "utf8")) as T;
+    const raw = JSON.parse(await readFile(p, "utf8")) as unknown;
+    return schema ? schema.parse(raw) : (raw as T);
   }
   return fallback;
 }
 
 export async function loadStore(): Promise<Store> {
+  const run = await loadJson<PipelineRun | null>("data/artifacts/pipeline-run.json", null, PipelineRunSchema.nullable());
+  const properties = await loadJson("data/artifacts/properties.json", [], z.array(PropertySchema));
+  const permits = await loadJson("data/artifacts/permits.json", [], z.array(PermitSchema));
+  const contractors = await loadJson("data/artifacts/contractors.json", [], z.array(ContractorSchema));
+  const businesses = await loadJson("data/artifacts/businesses.json", [], z.array(BusinessSchema));
   return {
-    run: await loadJson<PipelineRun | null>("data/artifacts/pipeline-run.json", null),
-    properties: await loadJson("data/artifacts/properties.json", []),
-    permits: await loadJson("data/artifacts/permits.json", []),
-    contractors: await loadJson("data/artifacts/contractors.json", []),
-    businesses: await loadJson("data/artifacts/businesses.json", []),
+    run,
+    properties,
+    permits,
+    contractors,
+    businesses,
+    source: run || properties.length ? "artifacts" : "missing",
   };
 }
 
@@ -67,11 +81,15 @@ export function queryProperties(store: Store, q: QueryArgs) {
       return { property: p, miles, permits };
     })
     .filter((row) => row.miles <= q.radiusMiles)
-    .filter((row) =>
-      q.minRoofAgeYears == null
-        ? true
-        : row.property.roofAgeYears != null && row.property.roofAgeYears >= q.minRoofAgeYears,
-    )
+    .filter((row) => {
+      if (q.minRoofAgeYears == null) return true;
+      const roof = row.property.roofAgeYears;
+      const proxy = row.property.constructionAgeYears;
+      return (
+        (roof != null && roof >= q.minRoofAgeYears) ||
+        (proxy != null && proxy >= q.minRoofAgeYears)
+      );
+    })
     .filter((row) => {
       if (!q.openRoofingOnly && !q.openPermitsOnly) return true;
       return row.permits.some((x) => {

@@ -23,7 +23,7 @@ function prop(over: Partial<Property> = {}): Property {
 }
 
 function store(properties: Property[], permits: Permit[] = []): Store {
-  return { run: null, properties, permits, contractors: [], businesses: [] };
+  return { run: null, properties, permits, contractors: [], businesses: [], source: "artifacts" };
 }
 
 describe("queryProperties", () => {
@@ -67,6 +67,47 @@ describe("queryProperties", () => {
       radiusMiles: 5,
       openRoofingOnly: true,
       minOpenDays: 365,
+    });
+    assert.equal(rows.length, 1);
+  });
+
+  it("filters open county permits that are not roofing-tagged", () => {
+    const p = prop({ propertyId: "chester:well" });
+    const permit: Permit = {
+      permitId: "w1",
+      propertyId: p.propertyId,
+      permitType: "County health well",
+      isRoofing: false,
+      status: "open",
+      openedAt: "2016-01-01T00:00:00Z",
+      closedAt: null,
+      openDurationDays: 2000,
+      contractorName: "Kevin Murphy",
+      contractorId: "kevin-murphy",
+      provenance: { sourceId: "t", collectedAt: "2026-01-01", county: "Chester" },
+    };
+    const rows = queryProperties(store([p], [permit]), {
+      lat: 39.9607,
+      lng: -75.6055,
+      radiusMiles: 5,
+      openPermitsOnly: true,
+      minOpenDays: 1825,
+    });
+    assert.equal(rows.length, 1);
+  });
+
+  it("does not treat construction proxy as roofAgeYears", () => {
+    const p = prop({
+      propertyId: "chester:ld",
+      roofAgeYears: null,
+      roofAgeBasis: "unknown",
+      constructionAgeYears: 20,
+    });
+    const rows = queryProperties(store([p]), {
+      lat: 39.9607,
+      lng: -75.6055,
+      radiusMiles: 5,
+      minRoofAgeYears: 15,
     });
     assert.equal(rows.length, 1);
   });

@@ -1,5 +1,5 @@
 import { ringCentroid, bboxAround } from "../lib/geo.ts";
-import { queryMapLayer, type GisFeature } from "../lib/gis.ts";
+import { countMapLayer, queryMapLayer, type GisFeature } from "../lib/gis.ts";
 
 const DEFAULT_MAPSERVER =
   process.env.PASDA_MAPSERVER ??
@@ -21,6 +21,19 @@ export async function queryLayer(opts: {
     geometry: opts.geometry,
     maxRecords: opts.maxRecords,
     outFields: opts.outFields,
+  });
+}
+
+export async function countLayer(opts: {
+  layer: number;
+  where?: string;
+  geometry?: { minLng: number; minLat: number; maxLng: number; maxLat: number };
+}): Promise<number | null> {
+  return countMapLayer({
+    mapServer: DEFAULT_MAPSERVER,
+    layer: opts.layer,
+    where: opts.where,
+    geometry: opts.geometry,
   });
 }
 
