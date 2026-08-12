@@ -32,7 +32,7 @@
       "dataset": "contractors",
       "county": "Chester",
       "isFallback": false,
-      "records": 714,
+      "records": 356,
       "limitations": "BBB public bulk API not available; scores null unless harvested."
     },
     {
