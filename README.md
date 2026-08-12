@@ -7,7 +7,7 @@
 | Item | Location |
 |------|----------|
 | Live runtime | https://cc-bb-aa.github.io/oracle-property-intelligence-platform-pipeline-chester-county-pa/ |
-| Demo video | `demo/` (hyperframes source + Playwright recording) |
+| Demo video | `demo/out/oracle-demo-transcript.webm` and `demo/out/oracle-demo.mp4` |
 | PR | https://github.com/prismteam-ai/oracle-property-intelligence-platform-pipeline-chester-county-pa/pull/2 |
 | Discovery | `docs/chester-pa-county-findings.md`, `docs/chester-pa-sources.yaml` |
 | AC matrix | `ACCEPTANCE.md` |
@@ -25,7 +25,7 @@ npm start           # http://127.0.0.1:8080
 
 ### Hosted cost model
 
-Artifacts are JSON + optional DuckDB file. Content hashes stand in for IPFS CIDs (Filebase pin optional). The API is stateless over those files so the host can scale to zero. No always-on Oracle warehouse.
+Artifacts are JSON + optional DuckDB file. Publish writes CIDv0 via `ipfs-only-hash`. Set `FILEBASE_ACCESS_KEY` / `FILEBASE_SECRET_KEY` / `FILEBASE_BUCKET` to pin the same objects to Filebase. The API is stateless over those files so the host can scale to zero. No always-on Oracle warehouse.
 
 ## Context
 

@@ -43,6 +43,7 @@ app.post("/api/query", async (req, res) => {
     lng,
     radiusMiles,
     minRoofAgeYears: req.body.minRoofAgeYears ?? undefined,
+    openPermitsOnly: Boolean(req.body.openPermitsOnly),
     openRoofingOnly: Boolean(req.body.openRoofingOnly),
     minOpenDays: req.body.minOpenDays ?? undefined,
     minOwnershipYears: req.body.minOwnershipYears ?? undefined,
@@ -61,8 +62,9 @@ app.post("/api/agent", async (req, res) => {
     lat,
     lng,
     radiusMiles: q.includes("five miles") || q.includes("5 miles") ? 5 : 5,
-    minRoofAgeYears: q.includes("15") || q.includes("older") ? 15 : undefined,
-    openRoofingOnly: q.includes("open") && q.includes("permit"),
+    minRoofAgeYears: q.includes("15") || (q.includes("older") && q.includes("roof")) ? 15 : undefined,
+    openPermitsOnly: q.includes("open") && q.includes("permit"),
+    openRoofingOnly: q.includes("roofing") && q.includes("permit"),
     minOpenDays: q.includes("many years") ? 365 * 3 : undefined,
   };
   const rows = queryProperties(store, args);

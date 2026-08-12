@@ -46,13 +46,12 @@ function queryLocal(q) {
         : row.property.roofAgeYears != null && row.property.roofAgeYears >= q.minRoofAgeYears,
     )
     .filter((row) => {
-      if (!q.openRoofingOnly) return true;
-      return row.permits.some(
-        (x) =>
-          x.isRoofing &&
-          x.status === "open" &&
-          (q.minOpenDays == null || (x.openDurationDays ?? 0) >= q.minOpenDays),
-      );
+      if (!q.openRoofingOnly && !q.openPermitsOnly) return true;
+      return row.permits.some((x) => {
+        if (x.status !== "open") return false;
+        if (q.openRoofingOnly && !x.isRoofing) return false;
+        return q.minOpenDays == null || (x.openDurationDays ?? 0) >= q.minOpenDays;
+      });
     })
     .sort((a, b) => a.miles - b.miles)
     .map((row) => ({
@@ -130,7 +129,8 @@ $("query").onclick = async () => {
     lng: Number($("lng").value),
     radiusMiles: Number($("radius").value),
     minRoofAgeYears: $("aged").checked ? 15 : undefined,
-    openRoofingOnly: $("open").checked,
+    openPermitsOnly: $("open").checked,
+    openRoofingOnly: $("roofing")?.checked,
     minOpenDays: $("open").checked ? 365 : undefined,
   };
   try {
@@ -163,9 +163,10 @@ $("ask").onclick = async () => {
       lat,
       lng,
       radiusMiles: 5,
-      minRoofAgeYears: ql.includes("15") || ql.includes("older") ? 15 : undefined,
-      openRoofingOnly: ql.includes("open") && ql.includes("permit"),
-      minOpenDays: ql.includes("many years") ? 365 * 3 : undefined,
+      minRoofAgeYears: ql.includes("15") || (ql.includes("older") && ql.includes("roof")) ? 15 : undefined,
+      openPermitsOnly: ql.includes("open") && ql.includes("permit"),
+      openRoofingOnly: ql.includes("roofing") && ql.includes("permit"),
+      minOpenDays: ql.includes("many years") || ql.includes("five years") ? 365 : undefined,
     });
     $("agent").textContent = JSON.stringify(
       {

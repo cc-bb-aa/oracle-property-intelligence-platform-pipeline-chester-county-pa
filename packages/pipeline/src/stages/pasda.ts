@@ -1,13 +1,11 @@
 import { ringCentroid, bboxAround } from "../lib/geo.ts";
+import { queryMapLayer, type GisFeature } from "../lib/gis.ts";
 
 const DEFAULT_MAPSERVER =
   process.env.PASDA_MAPSERVER ??
   "https://mapservices.pasda.psu.edu/server/rest/services/pasda/ChesterCounty/MapServer";
 
-export type PasdaFeature = {
-  attributes: Record<string, unknown>;
-  geometry?: { rings?: number[][][] };
-};
+export type PasdaFeature = GisFeature;
 
 export async function queryLayer(opts: {
   layer: number;
@@ -16,46 +14,14 @@ export async function queryLayer(opts: {
   maxRecords: number;
   outFields?: string;
 }): Promise<PasdaFeature[]> {
-  const pageSize = 200;
-  const out: PasdaFeature[] = [];
-  let offset = 0;
-  while (out.length < opts.maxRecords) {
-    const params = new URLSearchParams({
-      where: opts.where ?? "1=1",
-      outFields: opts.outFields ?? "*",
-      returnGeometry: "true",
-      outSR: "4326",
-      f: "json",
-      resultOffset: String(offset),
-      resultRecordCount: String(Math.min(pageSize, opts.maxRecords - out.length)),
-    });
-    if (opts.geometry) {
-      params.set("geometryType", "esriGeometryEnvelope");
-      params.set("inSR", "4326");
-      params.set("spatialRel", "esriSpatialRelIntersects");
-      params.set(
-        "geometry",
-        JSON.stringify({
-          xmin: opts.geometry.minLng,
-          ymin: opts.geometry.minLat,
-          xmax: opts.geometry.maxLng,
-          ymax: opts.geometry.maxLat,
-          spatialReference: { wkid: 4326 },
-        }),
-      );
-    }
-    const url = `${DEFAULT_MAPSERVER}/${opts.layer}/query?${params.toString()}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`PASDA ${opts.layer} HTTP ${res.status}`);
-    const body = (await res.json()) as { features?: PasdaFeature[]; error?: unknown };
-    if (body.error) throw new Error(`PASDA error ${JSON.stringify(body.error)}`);
-    const feats = body.features ?? [];
-    if (!feats.length) break;
-    out.push(...feats);
-    if (feats.length < pageSize) break;
-    offset += feats.length;
-  }
-  return out;
+  return queryMapLayer({
+    mapServer: DEFAULT_MAPSERVER,
+    layer: opts.layer,
+    where: opts.where,
+    geometry: opts.geometry,
+    maxRecords: opts.maxRecords,
+    outFields: opts.outFields,
+  });
 }
 
 export function westChesterBbox(miles = 5) {

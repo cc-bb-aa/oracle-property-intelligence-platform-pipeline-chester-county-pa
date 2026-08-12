@@ -6,7 +6,7 @@
 | G2 | Neighbor fallbacks documented | sources.yaml fallbacks | documented |
 | G3 | Run summary states primary vs fallback | `/api/run` | in progress |
 | D1 | Load property records | pipeline properties.json | in progress |
-| D2 | Load roofing permits + open duration | permits.json + unit query | in progress |
+| D2 | Load roofing permits + open duration | real EnerGov/Act 247 harvest; roofing keyword-tagged | done |
 | D3 | Ownership fields | properties.owner* | in progress |
 | D4 | Contractors | contractors.json | in progress |
 | D5 | BBB scores where available | contractors.bbb* (null if unharvested) | documented |
@@ -16,7 +16,7 @@
 | D9 | Reconcile duplicates | reconcileProperties unit | done |
 | D10 | Provenance | provenance on every record | in progress |
 | I1 | No default ongoing Oracle infra cost | DuckDB file + content-addressed artifacts + scale-to-zero host | in progress |
-| I2 | IPFS / content ids | `/api/ipfs` | in progress |
+| I2 | IPFS / content ids | ipfs-only-hash CID + Filebase pin when FILEBASE_* set | done |
 | I3 | DuckDB query | writeDuckDb + JSON fallback | in progress |
 | I4 | MCP-ready | `/mcp/tools` `/mcp/call` | in progress |
 | I5 | Agent access | `/api/agent` | in progress |

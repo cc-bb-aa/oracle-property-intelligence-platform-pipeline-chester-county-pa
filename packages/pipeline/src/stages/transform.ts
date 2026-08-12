@@ -60,17 +60,28 @@ export function transformParcel(f: PasdaFeature): Property | null {
 }
 
 export function applyRoofingPermitAge(p: Property, permits: Permit[]): Property {
-  const roofing = permits.filter((x) => x.propertyId === p.propertyId && x.isRoofing);
-  const completed = roofing
+  const mine = permits.filter((x) => x.propertyId === p.propertyId);
+  const roofingDone = mine
+    .filter((x) => x.isRoofing)
+    .map((x) => x.closedAt)
+    .filter((x): x is string => Boolean(x))
+    .sort()
+    .at(-1);
+  const constructionDone = mine
+    .filter((x) => x.status === "closed" && /act 247|construct|building|land-development/i.test(`${x.permitType} ${x.description ?? ""}`))
     .map((x) => x.closedAt)
     .filter((x): x is string => Boolean(x))
     .sort()
     .at(-1);
   const { age, basis } = roofAgeYears({
     yearBuilt: p.yearBuilt,
-    lastRoofingCompletedAt: completed ?? null,
+    lastRoofingCompletedAt: roofingDone ?? constructionDone ?? null,
   });
-  return { ...p, roofAgeYears: age, roofAgeBasis: basis };
+  return {
+    ...p,
+    roofAgeYears: age,
+    roofAgeBasis: roofingDone ? basis : constructionDone ? "last_construction_permit" : basis,
+  };
 }
 
 export function contractorsFromPermits(permits: Permit[]): Contractor[] {

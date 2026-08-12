@@ -1,7 +1,7 @@
 {
-  "runId": "2670cc5e-2213-4000-a00a-776a4703e2b0",
-  "startedAt": "2026-08-12T16:01:31.266Z",
-  "finishedAt": "2026-08-12T16:01:37.353Z",
+  "runId": "19895dc5-550f-48e7-ad7c-8784f22e3d5b",
+  "startedAt": "2026-08-12T16:36:11.108Z",
+  "finishedAt": "2026-08-12T16:36:27.724Z",
   "primaryCounty": "Chester",
   "fallbacksAttempted": [],
   "coverage": [
@@ -9,7 +9,7 @@
       "dataset": "parcels",
       "county": "Chester",
       "isFallback": false,
-      "records": 1993,
+      "records": 2493,
       "sourceUrl": "https://mapservices.pasda.psu.edu/server/rest/services/pasda/ChesterCounty/MapServer/11",
       "limitations": "West Chester 5mi slice (INGEST_MODE=west-chester-slice). Full county: INGEST_MODE=full."
     },
@@ -17,66 +17,66 @@
       "dataset": "permits",
       "county": "Chester",
       "isFallback": false,
-      "records": 40,
-      "sourceUrl": "permit-adapter-fallback-seed",
-      "limitations": "County permit portal (Evolve) is account-gated. Fallback seeds use real Chester parcel UPIs and are labeled in provenance."
+      "records": 952,
+      "sourceUrl": "chesco-energov+act247-gis",
+      "limitations": "Harvested 952 real Chester County GIS permits (health well/sewage, Act 247 land-dev/subdivision, EnerGov PermitManagement). Municipal building/roofing UCC (Evolve / West Chester SmartGov) is account- or form-walled and was not synthesized. isRoofing is keyword-tagged only; most records are county health or planning cases."
     },
     {
       "dataset": "ownership",
       "county": "Chester",
       "isFallback": false,
-      "records": 1985,
+      "records": 2484,
       "sourceUrl": "PASDA parcel OWN*/ADDR*/DEED_REC_D"
     },
     {
       "dataset": "contractors",
       "county": "Chester",
       "isFallback": false,
-      "records": 3,
+      "records": 714,
       "limitations": "BBB public bulk API not available; scores null unless harvested."
     },
     {
       "dataset": "businesses",
       "county": "Chester",
       "isFallback": false,
-      "records": 75,
+      "records": 89,
       "limitations": "Sunbiz is Florida-only. PA uses commercial parcel owners."
     },
     {
       "dataset": "coordinates",
       "county": "Chester",
       "isFallback": false,
-      "records": 1993
+      "records": 2493
     }
   ],
   "counts": {
-    "properties": 1993,
-    "permits": 40,
-    "contractors": 3,
-    "businesses": 75,
-    "rawPasdaFeatures": 2000
+    "properties": 2493,
+    "permits": 952,
+    "contractors": 714,
+    "businesses": 89,
+    "rawPasdaFeatures": 2500
   },
   "ipfs": [
     {
       "artifact": "properties.json",
-      "cid": "sha256-5e5417c4c8f07c504a0558f5fab8a3008d20190e09252edbbaeccb881f6df149"
+      "cid": "QmbSdLkP7Gy59ixW2jSMAyuApV51AMW8td2BDP29xRsDhz"
     },
     {
       "artifact": "permits.json",
-      "cid": "sha256-aa6fa9150529b349f163d9c0228b43f78a2f775ca52cc2db8fd4cec25a96eb50"
+      "cid": "QmdbnL6fEmsozKb8yr4TsNT675NgXLC2cXxP6A2bdVnbLS"
     },
     {
       "artifact": "contractors.json",
-      "cid": "sha256-7a4970c4a7764de6d2d57832d637d64a914713c21c71875d92f3b454168110ae"
+      "cid": "QmaUEDFuAwZM5k3q6ZpLcNhjErxQw1rCk9djhNbgcAmzJ9"
     },
     {
       "artifact": "businesses.json",
-      "cid": "sha256-45521893781635bb3cb39f9427276a3f7136f82c93b5ca9ab432be842726e934"
+      "cid": "QmcZvKxazxy4msnXrnFBh186Z5utH5Uq2nA1BDhLA7GRiE"
     }
   ],
   "duckdbPath": "/Users/it/dev/prism-homework/forks/oracle-property-intelligence-platform-pipeline-chester-county-pa/data/duckdb/chester.duckdb",
   "limitations": [
-    "County permit portal (Evolve) is account-gated. Fallback seeds use real Chester parcel UPIs and are labeled in provenance.",
+    "Harvested 952 real Chester County GIS permits (health well/sewage, Act 247 land-dev/subdivision, EnerGov PermitManagement). Municipal building/roofing UCC (Evolve / West Chester SmartGov) is account- or form-walled and was not synthesized. isRoofing is keyword-tagged only; most records are county health or planning cases.",
     "Year built not on PASDA parcel layer; roof age uses last roofing permit when present.",
     "Sunbiz not applicable in Pennsylvania.",
     "BBB scores require harvested seed; default null."

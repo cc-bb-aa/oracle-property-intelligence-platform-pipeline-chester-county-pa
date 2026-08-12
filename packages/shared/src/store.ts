@@ -21,9 +21,12 @@ export type Store = {
 const root = () => resolve(process.env.ORACLE_ROOT ?? process.cwd());
 
 async function loadJson<T>(rel: string, fallback: T): Promise<T> {
-  const p = resolve(root(), rel);
-  if (!existsSync(p)) return fallback;
-  return JSON.parse(await readFile(p, "utf8")) as T;
+  const candidates = [resolve(root(), rel), resolve(root(), rel.replace("data/artifacts/", "apps/web/public/data/"))];
+  for (const p of candidates) {
+    if (!existsSync(p)) continue;
+    return JSON.parse(await readFile(p, "utf8")) as T;
+  }
+  return fallback;
 }
 
 export async function loadStore(): Promise<Store> {
@@ -42,6 +45,7 @@ export type QueryArgs = {
   radiusMiles: number;
   minRoofAgeYears?: number;
   openRoofingOnly?: boolean;
+  openPermitsOnly?: boolean;
   minOpenDays?: number;
   minOwnershipYears?: number;
   regionalOwnersOnly?: boolean;
@@ -69,13 +73,12 @@ export function queryProperties(store: Store, q: QueryArgs) {
         : row.property.roofAgeYears != null && row.property.roofAgeYears >= q.minRoofAgeYears,
     )
     .filter((row) => {
-      if (!q.openRoofingOnly) return true;
-      return row.permits.some(
-        (x) =>
-          x.isRoofing &&
-          x.status === "open" &&
-          (q.minOpenDays == null || (x.openDurationDays ?? 0) >= q.minOpenDays),
-      );
+      if (!q.openRoofingOnly && !q.openPermitsOnly) return true;
+      return row.permits.some((x) => {
+        if (x.status !== "open") return false;
+        if (q.openRoofingOnly && !x.isRoofing) return false;
+        return q.minOpenDays == null || (x.openDurationDays ?? 0) >= q.minOpenDays;
+      });
     })
     .filter((row) =>
       q.minOwnershipYears == null

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, copyFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import type { PipelineRun } from "../../schema/src/index.ts";
@@ -47,7 +47,7 @@ export async function runPipeline(): Promise<PipelineRun> {
   );
 
   const permitSeed = resolve(ROOT, "data/seeds/permits-chester-pa.json");
-  const harvest = await loadPermitHarvest(permitSeed, properties0);
+  const harvest = await loadPermitHarvest(permitSeed, properties0, geom);
   const properties = properties0.map((p) => applyRoofingPermitAge(p, harvest.permits));
   const contractors = contractorsFromPermits(harvest.permits);
   const businesses = businessesFromOwners(properties);
@@ -166,6 +166,19 @@ export async function runPipeline(): Promise<PipelineRun> {
   };
 
   await writeFile(resolve(ROOT, "data/artifacts/pipeline-run.json"), JSON.stringify(run, null, 2));
+
+  const publicDir = resolve(ROOT, "apps/web/public/data");
+  await mkdir(publicDir, { recursive: true });
+  for (const name of [
+    "properties.json",
+    "permits.json",
+    "contractors.json",
+    "businesses.json",
+    "pipeline-run.json",
+  ]) {
+    await copyFile(resolve(ROOT, "data/artifacts", name), resolve(publicDir, name));
+  }
+
   return run;
 }
 

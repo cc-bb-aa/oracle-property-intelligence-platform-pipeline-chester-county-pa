@@ -11,17 +11,36 @@ appraisal:
   status: certified
 gis_hub: https://chester-county-s-gis-hub-chesco.hub.arcgis.com/
 permits:
+  - jurisdiction: Chester County Health
+    vendor: tyler-energov
+    url: https://gisprodops.chesco.org/server/rest/services/EnerGov_Services/EnerGov_Data_D_CL2/MapServer
+    layers: [WellPermits:11, SewagePermits:12]
+    search: public-mapserver
+    status: harvested
+  - jurisdiction: Chester County Planning
+    vendor: act-247-gis
+    url: https://gisprodops.chesco.org/server/rest/services/Planning_Services/Plan_Act247_AGOL_D/MapServer
+    layers: [land-dev:2, subdivision:3]
+    search: public-mapserver
+    status: harvested
+  - jurisdiction: Chester County EnerGov history
+    vendor: tyler-energov
+    url: https://gisprodops.chesco.org/server/rest/services/EnerGov_Services/EnerGov_History_D_CL2/MapServer
+    layers: [EG_HIST_POINT:0, EG_HIST_POLY:2]
+    search: public-mapserver
+    status: harvested
   - jurisdiction: Chester County
     vendor: infovision-evolve
     url: https://evolvepublic.infovisionsoftware.com/chester/
     search: account-required
     probe: login-wall
-    status: needs-harvest
+    status: not-harvested-login-wall
+    note: municipal/county building UCC is not in the public GIS harvest
   - jurisdiction: West Chester Borough
-    vendor: municipal
-    url: https://www.west-chester.com/862/Building-Permits
-    search: informational
-    status: discovered
+    vendor: smartgov
+    url: https://bor-westchester-pa.smartgovcommunity.com/
+    search: applicant-portal
+    status: discovered-not-bulk
 sunbiz:
   applicable: false
   note: Florida-only. PA uses commercial parcel owners as business layer.
