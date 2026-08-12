@@ -1,0 +1,47 @@
+{
+  "tools": [
+    {
+      "name": "queryProperties",
+      "description": "Radius query over Chester County property intelligence.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          },
+          "radiusMiles": {
+            "type": "number"
+          },
+          "minRoofAgeYears": {
+            "type": "number"
+          },
+          "openPermitsOnly": {
+            "type": "boolean"
+          },
+          "openRoofingOnly": {
+            "type": "boolean"
+          },
+          "minOpenDays": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "name": "getPipelineRun",
+      "description": "Latest pipeline run summary."
+    }
+  ],
+  "runId": "a08ba375-b4fc-47f3-b05b-7a9e22717b27",
+  "counts": {
+    "properties": 2493,
+    "permits": 952,
+    "contractors": 356,
+    "businesses": 89,
+    "rawPasdaFeatures": 2500
+  },
+  "note": "Hosted Pages runtime evaluates tools client-side against published artifacts. Node /mcp/call is available when the API is deployed."
+}
