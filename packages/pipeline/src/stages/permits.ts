@@ -325,13 +325,3 @@ export async function loadPermitHarvest(
       "isRoofing is keyword-tagged only; most records are county health or planning cases.",
   };
 }
-
-export function enrichContractorsBbb(
-  contractors: { contractorId: string; name: string }[],
-): { contractorId: string; name: string; bbbScore: number | null; bbbRating: string | null }[] {
-  return contractors.map((c) => ({
-    ...c,
-    bbbScore: null,
-    bbbRating: null,
-  }));
-}

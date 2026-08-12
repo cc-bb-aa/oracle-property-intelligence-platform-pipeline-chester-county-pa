@@ -64,13 +64,7 @@ export async function runPipeline(): Promise<PipelineRun> {
   const duckdbPath = resolve(ROOT, "data/duckdb/chester.duckdb");
   let duckLimitation: string | undefined;
   try {
-    await writeDuckDb({
-      path: duckdbPath,
-      properties,
-      permits: harvest.permits,
-      contractors,
-      businesses,
-    });
+    await writeDuckDb(duckdbPath, resolve(ROOT, "data/artifacts"));
   } catch (err) {
     duckLimitation = `DuckDB native write failed (${String(err)}). JSON artifacts remain queryable.`;
   }
