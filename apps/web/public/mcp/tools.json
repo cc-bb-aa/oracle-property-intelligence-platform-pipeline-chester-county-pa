@@ -1,0 +1,14 @@
+{
+  "tools": [
+    {
+      "name": "queryProperties",
+      "description": "Radius query over Chester County property intelligence"
+    },
+    {
+      "name": "getPipelineRun",
+      "description": "Latest pipeline run summary"
+    }
+  ],
+  "runId": "2670cc5e-2213-4000-a00a-776a4703e2b0",
+  "note": "Hosted Pages runtime evaluates tools client-side against published artifacts. Node /mcp/call is available when the API is deployed."
+}

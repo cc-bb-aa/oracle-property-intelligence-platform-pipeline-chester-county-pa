@@ -7,8 +7,8 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: "npm run start",
-        url: "http://127.0.0.1:8080/health",
+        command: "npx --yes serve apps/web/public -l 8080",
+        url: "http://127.0.0.1:8080",
         reuseExistingServer: true,
         timeout: 120_000,
       },

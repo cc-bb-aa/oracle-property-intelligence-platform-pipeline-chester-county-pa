@@ -1,0 +1,38 @@
+[
+  {
+    "contractorId": "keystone-roofing-llc",
+    "name": "Keystone Roofing LLC",
+    "bbbScore": null,
+    "bbbRating": null,
+    "provenance": {
+      "sourceId": "permit-adapter-fallback-seed",
+      "collectedAt": "2026-08-12T16:01:35.939Z",
+      "county": "Chester",
+      "notes": "Chester County Evolve permit portal requires login. Fallback seeds attach to real PASDA parcels so CRM radius queries work. Replace via data/seeds/permits-chester-pa.json after harvest."
+    }
+  },
+  {
+    "contractorId": "brandywine-exteriors",
+    "name": "Brandywine Exteriors",
+    "bbbScore": null,
+    "bbbRating": null,
+    "provenance": {
+      "sourceId": "permit-adapter-fallback-seed",
+      "collectedAt": "2026-08-12T16:01:35.939Z",
+      "county": "Chester",
+      "notes": "Chester County Evolve permit portal requires login. Fallback seeds attach to real PASDA parcels so CRM radius queries work. Replace via data/seeds/permits-chester-pa.json after harvest."
+    }
+  },
+  {
+    "contractorId": "valley-forge-roof-co",
+    "name": "Valley Forge Roof Co",
+    "bbbScore": null,
+    "bbbRating": null,
+    "provenance": {
+      "sourceId": "permit-adapter-fallback-seed",
+      "collectedAt": "2026-08-12T16:01:35.939Z",
+      "county": "Chester",
+      "notes": "Chester County Evolve permit portal requires login. Fallback seeds attach to real PASDA parcels so CRM radius queries work. Replace via data/seeds/permits-chester-pa.json after harvest."
+    }
+  }
+]
