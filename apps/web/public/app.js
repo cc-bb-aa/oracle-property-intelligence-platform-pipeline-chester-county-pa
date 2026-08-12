@@ -109,13 +109,44 @@ async function loadStatic() {
   store.businesses = await tryFetch("./data/businesses.json");
 }
 
+function renderCoverage(run) {
+  if (!run || !$("coverage")) return;
+  const rows = (run.coverage || [])
+    .map(
+      (c) =>
+        `<tr><td>${c.dataset}</td><td>${c.county}${c.isFallback ? " (fallback)" : ""}</td><td>${c.records}</td><td>${c.limitations || c.sourceUrl || ""}</td></tr>`,
+    )
+    .join("");
+  $("coverage").innerHTML = `<p>Primary <strong>${run.primaryCounty}</strong>. Fallbacks attempted: ${
+    (run.fallbacksAttempted || []).join(", ") || "none (Montgomery / Delaware / Bucks unused)"
+  }. Run ${run.runId} · ${run.startedAt} → ${run.finishedAt}</p>
+    <table><thead><tr><th>Dataset</th><th>County</th><th>Records</th><th>Limitations / source</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderBySource() {
+  if (!$("bySource") || !store.properties.length) return;
+  const owners = store.properties.filter((p) => p.ownerName).length;
+  const coords = store.properties.filter((p) => Number.isFinite(p.lat)).length;
+  const bbb = store.contractors.filter((c) => c.bbbScore != null || c.bbbRating).length;
+  const collected = store.properties[0]?.provenance?.collectedAt ?? "";
+  $("bySource").innerHTML = `<table><thead><tr><th>Source</th><th>Records</th><th>Collected</th><th>Provenance</th></tr></thead><tbody>
+    <tr><td>Properties (PASDA)</td><td>${store.properties.length}</td><td>${collected}</td><td>pasda-chester-parcels-202604</td></tr>
+    <tr><td>Permits (EnerGov / Act 247)</td><td>${store.permits.length}</td><td>${store.permits[0]?.provenance?.collectedAt ?? ""}</td><td>${[...new Set(store.permits.map((p) => p.provenance.sourceId))].join(", ")}</td></tr>
+    <tr><td>Ownership</td><td>${owners}</td><td>${collected}</td><td>PASDA OWN*</td></tr>
+    <tr><td>Contractors (BBB where available)</td><td>${store.contractors.length} (BBB ${bbb})</td><td>${collected}</td><td>permit applicants; BBB null without a public bulk API</td></tr>
+    <tr><td>Businesses</td><td>${store.businesses.length}</td><td>${collected}</td><td>commercial parcel owners (Sunbiz is FL-only)</td></tr>
+    <tr><td>Coordinates</td><td>${coords}</td><td>${collected}</td><td>PASDA polygon centroids</td></tr>
+  </tbody></table>`;
+}
+
 async function refresh() {
   try {
     const run = await tryFetch("/api/run");
+    store.run = run;
     $("run").textContent = JSON.stringify(run, null, 2);
     $("counts").textContent = JSON.stringify(await tryFetch("/api/counts"), null, 2);
     $("ipfs").textContent = JSON.stringify(await tryFetch("/api/ipfs"), null, 2);
-    return "api";
+    if (!store.properties.length) await loadStatic();
   } catch {
     await loadStatic();
     $("run").textContent = JSON.stringify(store.run, null, 2);
@@ -124,26 +155,38 @@ async function refresh() {
       permits: store.permits.length,
       contractors: store.contractors.length,
       businesses: store.businesses.length,
+      ownership: store.properties.filter((p) => p.ownerName).length,
+      coordinates: store.properties.filter((p) => Number.isFinite(p.lat)).length,
       ipfs: store.run?.ipfs ?? [],
     }, null, 2);
     $("ipfs").textContent = JSON.stringify(store.run?.ipfs ?? [], null, 2);
-    return "static";
+  }
+  renderCoverage(store.run);
+  renderBySource();
+  try {
+    $("mcp").textContent = JSON.stringify(await tryFetch("./mcp/tools.json"), null, 2);
+  } catch {
+    $("mcp").textContent = "MCP catalog unavailable";
   }
 }
 
 function renderTable(data) {
   const rows = data.results
-    .map(
-      (r) => `<tr>
-        <td>${r.property.address}<br><small>${r.property.upi} · ${r.miles.toFixed(2)} mi</small></td>
+    .map((r) => {
+      const bbb = (r.contractors || [])
+        .map((c) => `${c.name} BBB ${c.bbbRating ?? c.bbbScore ?? "n/a"}`)
+        .join("; ");
+      return `<tr>
+        <td>${r.property.address}<br><small>${r.property.upi} · ${r.miles.toFixed(2)} mi · ${r.property.lat.toFixed(4)}, ${r.property.lng.toFixed(4)}</small></td>
         <td>${r.property.roofAgeYears ?? "—"} (${r.property.roofAgeBasis})</td>
         <td>${(r.permits || []).map((p) => `${p.status} ${p.openDurationDays ?? ""}d ${p.contractorName ?? ""}`).join("<br>")}</td>
+        <td>${bbb || "BBB n/a"}</td>
         <td>${r.property.provenance.sourceId}</td>
-      </tr>`,
-    )
+      </tr>`;
+    })
     .join("");
   $("table").innerHTML = `<p>${data.count} matches (showing ${data.results.length})</p>
-    <table><thead><tr><th>Property</th><th>Roof age</th><th>Permits</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>`;
+    <table><thead><tr><th>Property / coords</th><th>Roof age</th><th>Permits</th><th>Contractor / BBB</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 $("reload").onclick = refresh;

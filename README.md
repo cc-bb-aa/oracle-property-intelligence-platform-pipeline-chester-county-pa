@@ -7,7 +7,7 @@
 | Item | Location |
 |------|----------|
 | Live runtime | https://cc-bb-aa.github.io/oracle-property-intelligence-platform-pipeline-chester-county-pa/ |
-| Demo video | `demo/out/oracle-demo-transcript.webm` and `demo/out/oracle-demo.mp4` |
+| Demo video | `demo/out/oracle-demo-transcript.webm` (full Demo Transcript walkthrough) + `demo/out/oracle-demo.mp4` |
 | PR | https://github.com/prismteam-ai/oracle-property-intelligence-platform-pipeline-chester-county-pa/pull/2 |
 | Discovery | `docs/chester-pa-county-findings.md`, `docs/chester-pa-sources.yaml` |
 | AC matrix | `ACCEPTANCE.md` |

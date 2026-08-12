@@ -28,20 +28,34 @@
     <p>DuckDB + content-addressed artifacts + MCP-ready query. Roofing lead signals for the CRM.</p>
   </header>
   <main>
-    <section>
+    <section id="sec-run">
       <h2>Pipeline run summary</h2>
       <div class="row">
         <button id="reload">Reload run</button>
         <button id="rerun" title="Requires Node API">Run pipeline</button>
       </div>
+      <div id="coverage"></div>
       <pre id="run">loading…</pre>
     </section>
-    <section>
-      <h2>Counts + IPFS artifacts</h2>
+    <section id="sec-counts">
+      <h2>Uploaded records by source</h2>
+      <div id="bySource"></div>
       <pre id="counts"></pre>
+    </section>
+    <section id="sec-duckdb">
+      <h2>DuckDB-backed query layer</h2>
+      <p id="duckdb">
+        Loaded Chester artifacts are queryable as a portable DuckDB file plus the same JSON
+        tables in this UI. No always-on Oracle warehouse is required. This hosted runtime
+        runs the structured query in the browser against the published JSON (same schema
+        DuckDB writes locally).
+      </p>
+    </section>
+    <section id="sec-ipfs">
+      <h2>IPFS artifacts</h2>
       <pre id="ipfs"></pre>
     </section>
-    <section>
+    <section id="sec-query">
       <h2>DuckDB-backed / JSON query (radius)</h2>
       <label>lat <input id="lat" value="39.9607" /></label>
       <label>lng <input id="lng" value="-75.6055" /></label>
@@ -52,11 +66,19 @@
       <button id="query">Query</button>
       <div id="table"></div>
     </section>
-    <section>
+    <section id="sec-agent">
       <h2>Agent query</h2>
-      <textarea id="q" rows="3" style="width:100%">Which properties near that area have open roofing permits that have been open for many years, and who is the listed contractor?</textarea>
+      <textarea id="q" rows="3" style="width:100%">Which properties in Chester County within five miles of West Chester have roofs older than 15 years?</textarea>
       <button id="ask">Ask agent</button>
       <pre id="agent"></pre>
+    </section>
+    <section id="sec-mcp">
+      <h2>MCP-ready interface</h2>
+      <p>
+        Agents and the roofing CRM call the same query model
+        (<code>queryProperties</code>, <code>getPipelineRun</code>) without changing the data contract.
+      </p>
+      <pre id="mcp"></pre>
     </section>
   </main>
   <script src="./app.js"></script>

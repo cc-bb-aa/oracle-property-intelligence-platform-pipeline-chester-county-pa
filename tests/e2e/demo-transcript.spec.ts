@@ -5,7 +5,10 @@ test("demo transcript surfaces exist", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /Oracle pipeline/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: /Pipeline run summary/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: /Agent query/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /MCP-ready/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /DuckDB-backed query layer/ })).toBeVisible();
   await expect(page.locator("#run")).not.toHaveText("loading…", { timeout: 30_000 });
+  await expect(page.locator("#coverage")).toContainText("Chester");
 });
 
 test("radius query returns aged roofs", async ({ page }) => {
