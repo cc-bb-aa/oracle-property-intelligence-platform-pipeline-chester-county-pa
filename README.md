@@ -1,75 +1,50 @@
-# Oracle Property Intelligence Platform Pipeline - Chester County, PA
+# Roofing CRM & Lead Identification UI
 
 ## Context
 
-The Oracle ingestion pipeline has been started, but the full Rock Island County, IL dataset has not been completely uploaded, reconciled, or demonstrated. The infrastructure must be designed so Oracle does not carry ongoing infrastructure cost by default. For this candidate exercise, the candidate acts as both Oracle and builder: they are responsible for completing the pipeline and proving the low-cost infrastructure approach.
-In addition to standard property intelligence, the pipeline must surface signals relevant to data-center site selection (parcel size, ownership stability, zoning/permit history, proximity to power infrastructure, and related public data).
+Roofing companies need a practical CRM for finding and qualifying residential and commercial roofing leads in their service area. The immediate requirement is a map-based CRM that helps sales teams explore local properties (Chester County, PA by default), surface roofs that are aging or have stalled open permits, and turn those signals into actionable outreach opportunities.
+
+Data gathering and ingestion pipelines are covered by a separate user story and are out of scope for this work. This story assumes property, permit, and related enrichment data are already available for the UI and agent to consume.
 
 ## Description
 
-Complete the Oracle pipeline by loading all available Rock Island County, IL property, permit, ownership, business, contractor, location, and public-source data into an MCP-ready database. Use IPFS and DuckDB to minimize Oracle-hosted infrastructure costs while enabling UI and agent access to answer both general property intelligence questions and data-center suitability questions.
+Create a map-based roofing lead CRM that enables users to locate properties from their current GPS position or a pin drop on the map, set a search radius, and review candidate roofs that meet lead criteria—primarily roof age (for example, older than 15 years) and open roofing permits (especially permits that have remained open for many years).
+
+The UI should present property and permit details, including contractor information and BBB rating scores where available. Users should also be able to query the platform in natural language through a RAG-backed agent to discover roofing opportunities (for example, “show me open roofing permits older than five years within five miles of West Chester”).
 
 ## Acceptance Criteria
-- Run the Oracle pipeline until all available county data is uploaded.
-- Confirm the pipeline covers Rock Island County, Illinois.
-- Load available property records into the database.
-- Load available permit records into the database.
-- Load available ownership records into the database.
-- Load available contractor records into the database.
-- Load available business records into the database.
-- Load available location and coordinate data into the database.
-- Ingest or link any publicly available zoning, land-use, or utility-related data that can support data-center site evaluation.
-- Reconcile duplicate entities across all uploaded datasets.
-- Preserve source provenance for uploaded records.
-- Optimize pipeline performance where feasible.
-- Identify slow source sites or constrained data sources.
-- Document pipeline speed limitations and source constraints.
-- Design the infrastructure so Oracle does not carry ongoing infrastructure cost by default.
-- Use IPFS for decentralized storage of eligible dataset artifacts.
-- Use DuckDB for local or portable analytical querying.
-- Structure the database to support MCP access.
-- Enable agent access to query the database.
-- Provide a UI for exploring the uploaded data.
-- Support questions about properties with roofs older than 15 years.
-- Support questions about properties with a view of water.
-- Support questions about properties that have not exchanged ownership in more than 10 years.
-- Support questions about properties with regional (or out-of-area) owners.
-- Support questions about properties within walking distance of public transportation using property coordinates.
-- Support questions about properties within walking distance of Starbucks using property coordinates.
-- Support data-center–relevant queries, including:
-  - Parcels or assemblages above a configurable acreage threshold
-  - Ownership stability (long tenure / low turnover)
-  - Proximity to known or candidate power infrastructure (where public data exists)
-  - Relevant permit or zoning history that may affect industrial / data-center use
-- Return source-backed answers where source data is available.
-- Demonstrate the uploaded dataset through the UI.
-- Demonstrate the uploaded dataset through an agent query.
-- Demonstrate that Oracle can operate without carrying the infrastructure cost.
-- Confirm the candidate fulfilled both Oracle and builder responsibilities for this milestone.
-- Pass the demo using real uploaded Rock Island County records.
+
+- Default the map and search experience to Chester County, PA, with support for exploring properties in the user’s selected area.
+- Allow users to center property search on current GPS location and/or a pin dropped on the map.
+- Allow users to set a configurable search radius around the selected location.
+- Display properties within the radius that have roofs older than a configurable age threshold (default suggestion: 15 years).
+- Display properties within the radius that have open roofing permits, with emphasis on permits that have remained open for an extended period.
+- Show permit details in the UI, including permit status, age/open duration, contractor name, and BBB rating score when available.
+- Present a browsable list of matching roofing lead candidates derived from the map/radius filters.
+- Support creating and managing CRM lead records from identified properties and permits.
+- Provide a RAG-backed agent that answers natural-language queries about roofing opportunities using available property and permit data.
+- Keep data gathering, ingestion, and source-system integration out of scope; consume pre-existing/available datasets.
+- Show (disabled) sections on the CRM that would expand the product beyond the initial lead-identification workflow.
 
 ## Demo Transcript
-- Presenter: “I will demonstrate that the Oracle pipeline has loaded the full available dataset for Rock Island County, Illinois, that the data is queryable through DuckDB, that eligible artifacts are stored through IPFS, and that both the UI and agent can answer property intelligence and data-center suitability questions.”
-- Presenter: “First, I am opening the pipeline run summary.”
-  - Expected Result: The system displays the completed pipeline run, source list, record counts, timestamps, and any documented source limitations.
-- Presenter: “Show the total uploaded records by source.”
-  - Expected Result: The system shows uploaded property, permit, ownership, contractor, business, and coordinate records with collection timestamps and provenance.
-- Presenter: “Now I am opening the DuckDB-backed query layer.”
-  - Expected Result: The system confirms that the loaded data is available for structured querying without requiring Oracle-hosted database infrastructure.
-- Presenter: “Show the IPFS artifacts created for the uploaded datasets.”
-  - Expected Result: The system displays IPFS references or content identifiers for eligible dataset artifacts.
-- Presenter: “Using the UI, show properties that have not exchanged ownership in more than 10 years and that meet a minimum acreage threshold suitable for data-center consideration.”
-  - Expected Result: Matching properties are returned with supporting ownership history, acreage, and source provenance.
-- Presenter: “Show properties near candidate power infrastructure or with relevant industrial/zoning signals where data is available.”
-  - Expected Result: Results are returned with the geographic or permit basis clearly identified.
-- Presenter: “Now I am asking the same type of questions through the agent.”
-  - Agent Prompt: “Which larger parcels in Rock Island County have stable ownership (no recorded transfer in the last 10+ years) and any available signals related to power or industrial suitability?”
-    - Expected Result: The agent returns matching properties, explains the reasoning, and includes source-backed evidence.
-  - Agent Prompt: “Which properties appear to be strong candidates for further data-center review based on size, ownership age, and location/power signals?”
-    - Expected Result: The agent returns a ranked or filtered list using available data and clearly identifies any assumptions or missing data.
-- Presenter: “Finally, I will show that the system is MCP-ready.”
-  - Expected Result: The system demonstrates an MCP-ready interface or documented MCP-compatible query structure that agents can use without changing the data model.UI 
+
+- Open the CRM centered on Chester County, PA.
+- Drop a pin (or use GPS) and set a search radius.
+- Show roofs older than the age threshold (e.g., 15 years) within the radius.
+- Highlight properties with open roofing permits, prioritizing long-open permits.
+- Open a selected property/permit and review contractor details and BBB rating where available.
+- Convert one or more matches into CRM lead records.
+- Ask the RAG agent a natural-language query for roofing opportunities in the area and show relevant results.
+- Demonstrate filtering leads by roof age, permit status/open duration, and location radius.
+- Show disabled/placeholder sections for future CRM expansions beyond lead identification.
+
+## Out of Scope
+
+- Property, permit, ownership, or enrichment data collection and ingestion pipelines (separate story).
+- Live BBB API integration beyond displaying scores already present in available data.
+- Actual outbound messaging to property owners (can be mocked or deferred).
 
 ## Reference
+
 - [Soofi XYZ Team Kit](https://github.com/soofi-xyz/soofi-xyz-team-kit)
 - [Elephant Oracle Skills](https://github.com/elephant-xyz/skills)
