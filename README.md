@@ -1,5 +1,31 @@
 # Oracle Property Intelligence Platform Pipeline - Chester County, PA
 
+## Candidate implementation (in progress)
+
+**Workflow A** of the Prism homework. Skills: elephant-xyz `county-discovery` / `county-permit-adapter` / publish stages, soofi `use-oracle`.
+
+| Item | Location |
+|------|----------|
+| Live runtime | _pending hosted deploy_ (slowking requires a public URL, not localhost) |
+| Demo video | _pending hyperframes_ |
+| Discovery | `docs/chester-pa-county-findings.md`, `docs/chester-pa-sources.yaml` |
+| AC matrix | `ACCEPTANCE.md` |
+
+### Local
+
+```bash
+npm install
+npm run pipeline    # PASDA Chester parcels (West Chester 5mi slice by default)
+npm test
+npm start           # http://127.0.0.1:8080
+```
+
+`INGEST_MODE=full MAX_PARCELS=20000 npm run pipeline` for a larger county pull.
+
+### Hosted cost model
+
+Artifacts are JSON + optional DuckDB file. Content hashes stand in for IPFS CIDs (Filebase pin optional). The API is stateless over those files so the host can scale to zero. No always-on Oracle warehouse.
+
 ## Context
 
 This repository is the **data gathering and ingestion pipeline** that supplies the [Roofing CRM & Lead Identification UI](https://github.com/prismteam-ai/roofing-crm). The CRM helps roofing companies explore properties in their service area, identify aging roofs and open roofing permits, and turn those signals into leads. This pipeline story covers collecting, loading, reconciling, and exposing the underlying property and permit datasets; the CRM UI/workflow itself is out of scope here.

@@ -1,0 +1,34 @@
+county: chester-pa
+state: PA
+primary: Chester
+fallbacks: [Montgomery, Delaware, Bucks]
+appraisal:
+  url: https://arcweb.chesco.org/cv4/
+  bulk: https://mapservices.pasda.psu.edu/server/rest/services/pasda/ChesterCounty/MapServer/11
+  mode: plain-http-api
+  parcel_id: UPI
+  year_built: missing-on-gis
+  status: certified
+gis_hub: https://chester-county-s-gis-hub-chesco.hub.arcgis.com/
+permits:
+  - jurisdiction: Chester County
+    vendor: infovision-evolve
+    url: https://evolvepublic.infovisionsoftware.com/chester/
+    search: account-required
+    probe: login-wall
+    status: needs-harvest
+  - jurisdiction: West Chester Borough
+    vendor: municipal
+    url: https://www.west-chester.com/862/Building-Permits
+    search: informational
+    status: discovered
+sunbiz:
+  applicable: false
+  note: Florida-only. PA uses commercial parcel owners as business layer.
+bbb:
+  bulk_api: false
+  status: scores-null-unless-seed
+pipeline_default:
+  ingest_mode: west-chester-slice
+  center: { lat: 39.9607, lng: -75.6055 }
+  radius_miles: 5

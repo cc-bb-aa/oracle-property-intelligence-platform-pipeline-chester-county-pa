@@ -1,0 +1,33 @@
+{
+  "name": "oracle-chester-county-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Oracle property intelligence pipeline for Chester County, PA (Prism homework).",
+  "scripts": {
+    "pipeline": "tsx packages/pipeline/src/run.ts",
+    "dev": "tsx watch apps/api/src/index.ts",
+    "start": "tsx apps/api/src/index.ts",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "node --import tsx --test tests/unit/*.test.ts",
+    "test:integration": "node --import tsx --test tests/integration/*.test.ts",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test && npm run test:e2e",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "duckdb": "^1.2.2",
+    "express": "^5.1.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
