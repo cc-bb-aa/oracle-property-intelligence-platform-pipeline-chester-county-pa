@@ -15,9 +15,9 @@ Load real Chester County property intelligence (and roofing-lead signals) into a
 | Gate | Status | Why |
 |------|--------|-----|
 | PR to designated repo | Pass | PR #2 against prismteam-ai/oracle-... |
-| Hosted runtime | Pass when Pages serves 200 | GitHub Pages URL, not localhost |
+| Hosted runtime | Pass | https://cc-bb-aa.github.io/oracle-property-intelligence-platform-pipeline-chester-county-pa/ (Playwright e2e 3/3 against hosted) |
 | Credentials | Pass | Public, no login |
-| Demo | Partial until video uploaded | Playwright e2e covers transcript surfaces; video in `demo/` |
+| Demo | Pass | `demo/out/oracle-demo-transcript.webm` + hyperframes source in `demo/` |
 
 ## Scorecard (self, pre-grader)
 
@@ -33,7 +33,7 @@ Load real Chester County property intelligence (and roofing-lead signals) into a
 | Speed | 4 | 75% | 3 | First hosted cut inside 48h window |
 | **Total** | 100 | | **77** | Conditional on Pages 200 + demo video attached |
 
-Verdict (self): **Partial Pass** until permit harvest is a real county extract and Pages is confirmed live.
+Verdict (self): **Partial Pass** on permits/BBB (adapter + null BBB). Runtime and demo gates are Pass.
 
 ## Functional outcome breakdown
 
