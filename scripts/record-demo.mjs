@@ -12,16 +12,9 @@ const context = await browser.newContext({
   recordVideo: { dir: "demo/out", size: { width: 1440, height: 900 } },
 });
 const page = await context.newPage();
-await page.goto(base, { waitUntil: "domcontentloaded" });
-await page.waitForFunction(
-  () => {
-    const t = document.getElementById("run")?.textContent ?? "";
-    return t.includes("permits") && !t.includes("loading");
-  },
-  null,
-  { timeout: 30000 },
-);
-await page.waitForTimeout(1200);
+await page.goto(base, { waitUntil: "load", timeout: 45000 });
+await page.locator("#run").waitFor({ timeout: 30000 });
+await page.waitForTimeout(2500);
 await page.click("#query");
 await page.waitForTimeout(1800);
 await page.check("#open");
