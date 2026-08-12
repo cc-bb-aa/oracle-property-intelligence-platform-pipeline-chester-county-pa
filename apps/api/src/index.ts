@@ -1,6 +1,7 @@
 import express from "express";
 import { resolve } from "node:path";
 import { loadStore, queryProperties } from "../../../packages/shared/src/store.ts";
+import { agentCaveats, parseAgentQuestion } from "../../../packages/shared/src/agent.ts";
 import { runPipeline } from "../../../packages/pipeline/src/run.ts";
 
 const app = express();
@@ -57,20 +58,13 @@ app.post("/api/agent", async (req, res) => {
   const store = await loadStore();
   const lat = Number(req.body.lat ?? 39.9607);
   const lng = Number(req.body.lng ?? -75.6055);
-  const q = question.toLowerCase();
-  const args = {
-    lat,
-    lng,
-    radiusMiles: q.includes("five miles") || q.includes("5 miles") ? 5 : 5,
-    minRoofAgeYears: q.includes("15") || (q.includes("older") && q.includes("roof")) ? 15 : undefined,
-    openPermitsOnly: q.includes("open") && q.includes("permit"),
-    openRoofingOnly: q.includes("roofing") && q.includes("permit"),
-    minOpenDays: q.includes("many years") ? 365 * 3 : undefined,
-  };
+  const parsed = parseAgentQuestion(question, lat, lng);
+  const { askedRoofingUcc, ...args } = parsed;
   const rows = queryProperties(store, args);
   res.json({
     question,
     assumptions: args,
+    caveats: agentCaveats(askedRoofingUcc),
     answer: `${rows.length} matching properties near West Chester (Chester County, PA).`,
     evidence: rows.slice(0, 15).map((r) => ({
       address: r.property.address,

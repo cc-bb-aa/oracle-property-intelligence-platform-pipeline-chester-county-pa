@@ -1,5 +1,43 @@
 const $ = (id) => document.getElementById(id);
 
+/** Keep in sync with packages/shared/src/agent.ts */
+function parseAgentQuestion(question, lat, lng) {
+  const q = question.toLowerCase();
+  const asksOpenPermit = q.includes("open") && q.includes("permit");
+  const askedRoofingUcc = asksOpenPermit && q.includes("roofing");
+  const asksAgedRoof =
+    !asksOpenPermit && (q.includes("15") || q.includes("older")) && q.includes("roof");
+  let minOpenDays;
+  if (asksOpenPermit) {
+    if (q.includes("many years")) minOpenDays = 365 * 3;
+    else if (q.includes("five years") || q.includes("5 years")) minOpenDays = 365 * 5;
+    else minOpenDays = 365;
+  }
+  return {
+    lat,
+    lng,
+    radiusMiles: 5,
+    minRoofAgeYears: asksAgedRoof ? 15 : undefined,
+    openPermitsOnly: asksOpenPermit,
+    openRoofingOnly: false,
+    askedRoofingUcc,
+    minOpenDays,
+  };
+}
+
+function agentCaveats(askedRoofingUcc) {
+  const caveats = [
+    "Municipal building/roofing UCC (Evolve / West Chester SmartGov) is not in the public harvest.",
+    "Open-permit results are Chester County Act 247 / EnerGov / health GIS, not municipal roofing permits.",
+  ];
+  if (askedRoofingUcc) {
+    caveats.push(
+      "isRoofing is keyword-tagged only; this harvest has no roofing-tagged rows. Showing long-open county permits instead.",
+    );
+  }
+  return caveats;
+}
+
 function miles(lat1, lng1, lat2, lng2) {
   const r = (d) => (d * Math.PI) / 180;
   const R = 3958.7613;
@@ -158,19 +196,19 @@ $("ask").onclick = async () => {
     $("agent").textContent = JSON.stringify(data, null, 2);
   } catch {
     if (!store.properties.length) await loadStatic();
-    const ql = question.toLowerCase();
-    const data = queryLocal({
-      lat,
-      lng,
-      radiusMiles: 5,
-      minRoofAgeYears: ql.includes("15") || (ql.includes("older") && ql.includes("roof")) ? 15 : undefined,
-      openPermitsOnly: ql.includes("open") && ql.includes("permit"),
-      openRoofingOnly: ql.includes("roofing") && ql.includes("permit"),
-      minOpenDays: ql.includes("many years") || ql.includes("five years") ? 365 : undefined,
-    });
+    const parsed = parseAgentQuestion(question, lat, lng);
+    const data = queryLocal(parsed);
     $("agent").textContent = JSON.stringify(
       {
         question,
+        assumptions: {
+          radiusMiles: parsed.radiusMiles,
+          minRoofAgeYears: parsed.minRoofAgeYears,
+          openPermitsOnly: parsed.openPermitsOnly,
+          openRoofingOnly: parsed.openRoofingOnly,
+          minOpenDays: parsed.minOpenDays,
+        },
+        caveats: agentCaveats(parsed.askedRoofingUcc),
         answer: `${data.count} matching properties near West Chester (Chester County, PA).`,
         evidence: data.results.slice(0, 15).map((r) => ({
           address: r.property.address,
@@ -179,7 +217,15 @@ $("ask").onclick = async () => {
           roofAgeYears: r.property.roofAgeYears,
           roofAgeBasis: r.property.roofAgeBasis,
           owner: r.property.ownerName,
-          permits: r.permits,
+          ownerIsRegional: r.property.ownerIsRegional,
+          permits: r.permits.map((p) => ({
+            permitId: p.permitId,
+            status: p.status,
+            openDurationDays: p.openDurationDays,
+            contractor: p.contractorName,
+            source: p.provenance.sourceId,
+            permitType: p.permitType,
+          })),
           source: r.property.provenance,
         })),
       },

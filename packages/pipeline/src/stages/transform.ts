@@ -28,14 +28,17 @@ export function transformParcel(f: PasdaFeature): Property | null {
     .filter((x) => x && x !== " ")
     .join(", ");
   const deed = String(a.DEED_REC_D ?? "").trim() || null;
-  const zip = String(a.ZIP1 ?? "").trim() || undefined;
+  const mailingZip = String(a.ZIP1 ?? "").trim() || undefined;
+  // ZIP1 is the owner mailing zip, not the site zip. Using it as siteZip
+  // made every owner look local (mailing string always contains ZIP1).
+  const siteZip = siteZipFromAddress(address);
   const { age, basis } = roofAgeYears({ yearBuilt: null, lastRoofingCompletedAt: null });
   return {
     propertyId: `chester:${upi}`,
     upi,
     address,
-    city: mailing.includes("PA") ? mailing.split(" PA")[0]?.split(" ").slice(-2).join(" ") : undefined,
-    zip,
+    city: cityFromPasda(a.ADDR2, mailing),
+    zip: siteZip ?? mailingZip,
     ownerName: ownerName || undefined,
     ownerMailing: mailing || undefined,
     lat: c.lat,
@@ -46,7 +49,7 @@ export function transformParcel(f: PasdaFeature): Property | null {
     lastSaleAmount: typeof a.LAST_SALE_ === "number" ? a.LAST_SALE_ : null,
     deedRecordedAt: deed,
     ownershipYears: yearsSince(deed),
-    ownerIsRegional: ownerIsRegional(zip, mailing),
+    ownerIsRegional: ownerIsRegional(siteZip, mailing),
     luc: String(a.LUC ?? "").trim() || undefined,
     propertyClass: String(a.CLASS ?? "").trim() || undefined,
     provenance: {
@@ -123,6 +126,21 @@ export function businessesFromOwners(properties: Property[]): Business[] {
     });
   }
   return out;
+}
+
+/** Site zip only when it is on the situs address. PASDA ZIP1 is mailing. */
+export function siteZipFromAddress(address: string): string | undefined {
+  const m = address.trim().match(/\b(\d{5})(?:-\d{4})?\s*$/);
+  return m?.[1];
+}
+
+export function cityFromPasda(addr2: unknown, mailing: string): string | undefined {
+  const line = String(addr2 ?? "").trim();
+  const lineMatch = line.match(/^(.+?)[,\s]+([A-Z]{2})$/i);
+  if (lineMatch) return lineMatch[1].replace(/,$/, "").trim();
+  const mailMatch = mailing.match(/,\s*([^,]+?)\s+([A-Z]{2})\b/i);
+  if (mailMatch) return mailMatch[1].trim();
+  return undefined;
 }
 
 export function slug(s: string): string {

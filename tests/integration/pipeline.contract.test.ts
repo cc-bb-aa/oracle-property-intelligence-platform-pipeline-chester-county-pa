@@ -12,6 +12,13 @@ describe("pipeline artifacts contract", () => {
     assert.ok(existsSync(resolve(root, "ACCEPTANCE.md")));
   });
 
+  it("mcp tools runId matches the published pipeline run", () => {
+    const run = JSON.parse(readFileSync(resolve(root, "apps/web/public/data/pipeline-run.json"), "utf8"));
+    const tools = JSON.parse(readFileSync(resolve(root, "apps/web/public/mcp/tools.json"), "utf8"));
+    assert.equal(tools.runId, run.runId);
+    assert.ok(tools.counts?.permits > 100);
+  });
+
   it("published permits are a real GIS harvest, not adapter seeds", () => {
     const path = resolve(root, "apps/web/public/data/permits.json");
     assert.ok(existsSync(path));

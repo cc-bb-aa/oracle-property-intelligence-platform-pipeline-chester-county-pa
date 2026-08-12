@@ -41,4 +41,8 @@ describe("ownerIsRegional", () => {
   it("same zip is local", () => {
     assert.equal(ownerIsRegional("19380", "100 W GAY ST, WEST CHESTER PA 19380"), false);
   });
+  it("does not treat mailing ZIP1 as the site zip", () => {
+    assert.equal(ownerIsRegional(undefined, "2455 PACES FERRY RD, ATLANTA GA 30339"), true);
+    assert.equal(ownerIsRegional(undefined, "1 HOWARD WAY, FARMINGTON HILLS MI 48331"), true);
+  });
 });

@@ -21,3 +21,15 @@ test("agent question returns evidence", async ({ page }) => {
   await page.getByRole("button", { name: "Ask agent" }).click();
   await expect(page.locator("#agent")).toContainText("matching properties", { timeout: 30_000 });
 });
+
+test("open-roofing agent returns county permits and a UCC caveat", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.locator("#run")).not.toHaveText("loading…", { timeout: 30_000 });
+  await page.locator("#q").fill(
+    "Which properties near that area have open roofing permits that have been open for many years, and who is the listed contractor?",
+  );
+  await page.getByRole("button", { name: "Ask agent" }).click();
+  await expect(page.locator("#agent")).toContainText("matching properties", { timeout: 30_000 });
+  await expect(page.locator("#agent")).not.toHaveText(/0 matching properties/);
+  await expect(page.locator("#agent")).toContainText("not in the public harvest");
+});

@@ -1,7 +1,7 @@
 {
-  "runId": "19895dc5-550f-48e7-ad7c-8784f22e3d5b",
-  "startedAt": "2026-08-12T16:36:11.108Z",
-  "finishedAt": "2026-08-12T16:36:27.724Z",
+  "runId": "a08ba375-b4fc-47f3-b05b-7a9e22717b27",
+  "startedAt": "2026-08-12T17:21:02.743Z",
+  "finishedAt": "2026-08-12T17:21:28.858Z",
   "primaryCounty": "Chester",
   "fallbacksAttempted": [],
   "coverage": [
@@ -59,19 +59,19 @@
   "ipfs": [
     {
       "artifact": "properties.json",
-      "cid": "QmbSdLkP7Gy59ixW2jSMAyuApV51AMW8td2BDP29xRsDhz"
+      "cid": "QmR6Z5jckFCmVvDCPaopmSvzfdbr1KVmw6PVK5Game64WL"
     },
     {
       "artifact": "permits.json",
-      "cid": "QmdbnL6fEmsozKb8yr4TsNT675NgXLC2cXxP6A2bdVnbLS"
+      "cid": "QmRG3gqkHjN9rhtekY4sb2mVmg4WHgwDxA4PgDMFYRREDv"
     },
     {
       "artifact": "contractors.json",
-      "cid": "QmaUEDFuAwZM5k3q6ZpLcNhjErxQw1rCk9djhNbgcAmzJ9"
+      "cid": "QmfBFipJJ53PXowV95JC8g3ddDEEf5NGLwryqMQdfpHf5o"
     },
     {
       "artifact": "businesses.json",
-      "cid": "QmcZvKxazxy4msnXrnFBh186Z5utH5Uq2nA1BDhLA7GRiE"
+      "cid": "QmVmZ6CN3Gp9htMra4RKFZiaAgizZDe6BpJfNkSWVvAKjL"
     }
   ],
   "duckdbPath": "/Users/it/dev/prism-homework/forks/oracle-property-intelligence-platform-pipeline-chester-county-pa/data/duckdb/chester.duckdb",

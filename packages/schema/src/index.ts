@@ -141,6 +141,15 @@ export function roofAgeYears(input: {
   return { age: null, basis: "unknown" };
 }
 
+export function mailingState(mailing: string): string | null {
+  const m = mailing.toUpperCase();
+  const withZip = m.match(/\b([A-Z]{2})[,\s]+\d{5}(?:-\d{4})?\b/);
+  if (withZip) return withZip[1];
+  const tail = m.match(/\b([A-Z]{2})\s*$/);
+  if (tail) return tail[1];
+  return null;
+}
+
 export function ownerIsRegional(
   siteZip: string | undefined,
   mailing: string | undefined,
@@ -148,8 +157,10 @@ export function ownerIsRegional(
 ): boolean | null {
   if (!mailing) return null;
   const m = mailing.toUpperCase();
-  const inState = m.includes(siteState);
-  if (siteZip && m.includes(siteZip.trim())) return false;
-  if (!inState) return true;
+  const state = mailingState(m);
+  // Do not use String.includes("PA") — it matches PACES, PARK, etc.
+  if (state && state !== siteState) return true;
+  if (siteZip && m.includes(siteZip.trim()) && (!state || state === siteState)) return false;
+  if (!state) return null;
   return false;
 }

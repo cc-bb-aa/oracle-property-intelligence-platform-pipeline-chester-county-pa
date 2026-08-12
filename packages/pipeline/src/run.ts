@@ -179,6 +179,37 @@ export async function runPipeline(): Promise<PipelineRun> {
     await copyFile(resolve(ROOT, "data/artifacts", name), resolve(publicDir, name));
   }
 
+  await writeFile(
+    resolve(ROOT, "apps/web/public/mcp/tools.json"),
+    JSON.stringify(
+      {
+        tools: [
+          {
+            name: "queryProperties",
+            description: "Radius query over Chester County property intelligence.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                lat: { type: "number" },
+                lng: { type: "number" },
+                radiusMiles: { type: "number" },
+                minRoofAgeYears: { type: "number" },
+                openPermitsOnly: { type: "boolean" },
+                openRoofingOnly: { type: "boolean" },
+              },
+            },
+          },
+          { name: "getPipelineRun", description: "Latest pipeline run summary." },
+        ],
+        runId: run.runId,
+        counts: run.counts,
+        note: "Hosted Pages runtime evaluates tools client-side against published artifacts. Node /mcp/call is available when the API is deployed.",
+      },
+      null,
+      2,
+    ),
+  );
+
   return run;
 }
 
