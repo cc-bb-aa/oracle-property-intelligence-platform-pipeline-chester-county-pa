@@ -1,50 +1,96 @@
-# Roofing CRM & Lead Identification UI
+# Oracle Property Intelligence Platform Pipeline - Chester County, PA
 
 ## Context
 
-Roofing companies need a practical CRM for finding and qualifying residential and commercial roofing leads in their service area. The immediate requirement is a map-based CRM that helps sales teams explore local properties (Chester County, PA by default), surface roofs that are aging or have stalled open permits, and turn those signals into actionable outreach opportunities.
+This repository is the **data gathering and ingestion pipeline** that supplies the [Roofing CRM & Lead Identification UI](https://github.com/prismteam-ai/roofing-crm). The CRM helps roofing companies explore properties in their service area, identify aging roofs and open roofing permits, and turn those signals into leads. This pipeline story covers collecting, loading, reconciling, and exposing the underlying property and permit datasets; the CRM UI/workflow itself is out of scope here.
 
-Data gathering and ingestion pipelines are covered by a separate user story and are out of scope for this work. This story assumes property, permit, and related enrichment data are already available for the UI and agent to consume.
+The Oracle ingestion pipeline has been started, but the full **Chester County, PA** dataset has not been completely uploaded, reconciled, or demonstrated. The infrastructure must be designed so Oracle does not carry ongoing infrastructure cost by default. For this candidate exercise, the candidate acts as both Oracle and builder: they are responsible for completing the pipeline and proving the low-cost infrastructure approach.
+
+**Primary geography:** Chester County, Pennsylvania.  
+**Fallback geography:** If required data is unavailable for Chester County, attempt neighboring Pennsylvania counties—**Montgomery**, **Delaware**, and **Bucks**—and document which county each dataset covers.
+
+In addition to standard property intelligence, the pipeline must surface signals relevant to **roofing lead generation**, including roof age, open roofing permits (especially long-open permits), contractor identity, BBB rating scores where available, ownership/contact fields where available, and accurate property coordinates for radius-based search.
 
 ## Description
 
-Create a map-based roofing lead CRM that enables users to locate properties from their current GPS position or a pin drop on the map, set a search radius, and review candidate roofs that meet lead criteria—primarily roof age (for example, older than 15 years) and open roofing permits (especially permits that have remained open for many years).
-
-The UI should present property and permit details, including contractor information and BBB rating scores where available. Users should also be able to query the platform in natural language through a RAG-backed agent to discover roofing opportunities (for example, “show me open roofing permits older than five years within five miles of West Chester”).
+Complete the Oracle pipeline by loading all available Chester County, PA (or documented neighboring-county fallback) property, permit, ownership, business, contractor, location, and public-source data into an MCP-ready database. Use IPFS and DuckDB to minimize Oracle-hosted infrastructure costs while enabling UI and agent access to answer property intelligence questions that support the roofing CRM—especially aged-roof and open-permit lead discovery within a map radius.
 
 ## Acceptance Criteria
 
-- Default the map and search experience to Chester County, PA, with support for exploring properties in the user’s selected area.
-- Allow users to center property search on current GPS location and/or a pin dropped on the map.
-- Allow users to set a configurable search radius around the selected location.
-- Display properties within the radius that have roofs older than a configurable age threshold (default suggestion: 15 years).
-- Display properties within the radius that have open roofing permits, with emphasis on permits that have remained open for an extended period.
-- Show permit details in the UI, including permit status, age/open duration, contractor name, and BBB rating score when available.
-- Present a browsable list of matching roofing lead candidates derived from the map/radius filters.
-- Support creating and managing CRM lead records from identified properties and permits.
-- Provide a RAG-backed agent that answers natural-language queries about roofing opportunities using available property and permit data.
-- Keep data gathering, ingestion, and source-system integration out of scope; consume pre-existing/available datasets.
-- Show (disabled) sections on the CRM that would expand the product beyond the initial lead-identification workflow.
+### Geography & coverage
+- Target **Chester County, PA** as the default and primary county for ingestion and demos.
+- If data is unavailable for Chester County for a given source, try neighboring Pennsylvania counties (**Montgomery**, **Delaware**, **Bucks**).
+- Document which county each uploaded dataset covers when falling back.
+- Confirm the pipeline run summary clearly states primary vs. fallback county coverage.
+
+### Data loading
+- Run the Oracle pipeline until all available county data is uploaded.
+- Load available property records into the database.
+- Load available permit records into the database, with emphasis on **roofing-related permits**.
+- Preserve permit status, open/close dates (or equivalent), and duration-open signals so long-open permits can be identified.
+- Load available ownership records into the database.
+- Load available contractor records into the database.
+- Load available BBB / contractor rating scores where publicly available.
+- Load available business records into the database.
+- Load available location and coordinate data into the database (required for GPS/pin-drop radius queries in the CRM).
+- Capture roof age or best-available proxies (e.g., year built, last roofing permit/completion date) so properties with roofs older than a configurable threshold (default suggestion: **15 years**) can be queried.
+- Reconcile duplicate entities across all uploaded datasets.
+- Preserve source provenance for uploaded records.
+
+### Infrastructure & access
+- Optimize pipeline performance where feasible.
+- Identify slow source sites or constrained data sources.
+- Document pipeline speed limitations and source constraints.
+- Design the infrastructure so Oracle does not carry ongoing infrastructure cost by default.
+- Use IPFS for decentralized storage of eligible dataset artifacts.
+- Use DuckDB for local or portable analytical querying.
+- Structure the database to support MCP access.
+- Enable agent access to query the database.
+- Provide a UI for exploring the uploaded data.
+
+### Roofing CRM–supporting queries
+- Support radius-based property identification using coordinates (around a GPS point or map pin).
+- Support questions about properties with roofs older than 15 years (or a configurable age threshold).
+- Support questions about properties with **open roofing permits**, including those that have remained open for many years.
+- Support returning permit details with contractor name and BBB rating score where available.
+- Support questions about properties that have not exchanged ownership in more than 10 years.
+- Support questions about properties with regional (or out-of-area) owners.
+- Return source-backed answers where source data is available.
+
+### Demonstration
+- Demonstrate the uploaded dataset through the UI.
+- Demonstrate the uploaded dataset through an agent query aligned to roofing lead discovery.
+- Demonstrate that Oracle can operate without carrying the infrastructure cost.
+- Confirm the candidate fulfilled both Oracle and builder responsibilities for this milestone.
+- Pass the demo using real uploaded Chester County records (or documented neighboring-county fallback records).
 
 ## Demo Transcript
-
-- Open the CRM centered on Chester County, PA.
-- Drop a pin (or use GPS) and set a search radius.
-- Show roofs older than the age threshold (e.g., 15 years) within the radius.
-- Highlight properties with open roofing permits, prioritizing long-open permits.
-- Open a selected property/permit and review contractor details and BBB rating where available.
-- Convert one or more matches into CRM lead records.
-- Ask the RAG agent a natural-language query for roofing opportunities in the area and show relevant results.
-- Demonstrate filtering leads by roof age, permit status/open duration, and location radius.
-- Show disabled/placeholder sections for future CRM expansions beyond lead identification.
+- Presenter: “I will demonstrate that the Oracle pipeline has loaded the available dataset for Chester County, Pennsylvania—or a documented neighboring-county fallback—that the data is queryable through DuckDB, that eligible artifacts are stored through IPFS, and that both the UI and agent can answer property intelligence questions that support roofing lead generation.”
+- Presenter: “First, I am opening the pipeline run summary.”
+  - Expected Result: The system displays the completed pipeline run, source list, county coverage (Chester vs. Montgomery/Delaware/Bucks fallback), record counts, timestamps, and any documented source limitations.
+- Presenter: “Show the total uploaded records by source.”
+  - Expected Result: The system shows uploaded property, permit, ownership, contractor (with BBB rating where available), business, and coordinate records with collection timestamps and provenance.
+- Presenter: “Now I am opening the DuckDB-backed query layer.”
+  - Expected Result: The system confirms that the loaded data is available for structured querying without requiring Oracle-hosted database infrastructure.
+- Presenter: “Show the IPFS artifacts created for the uploaded datasets.”
+  - Expected Result: The system displays IPFS references or content identifiers for eligible dataset artifacts.
+- Presenter: “Using the UI, show properties within a sample radius that have roofs older than 15 years.”
+  - Expected Result: Matching properties are returned with roof-age basis, coordinates, and source provenance.
+- Presenter: “Show properties in that area with open roofing permits, prioritizing permits that have remained open for many years, including contractor and BBB rating where available.”
+  - Expected Result: Results include permit status/open duration, contractor identity, BBB score when present, and clear source backing.
+- Presenter: “Now I am asking the same type of questions through the agent.”
+  - Agent Prompt: “Which properties in Chester County within five miles of West Chester have roofs older than 15 years?”
+    - Expected Result: The agent returns matching properties, explains the reasoning, and includes source-backed evidence.
+  - Agent Prompt: “Which properties near that area have open roofing permits that have been open for many years, and who is the listed contractor?”
+    - Expected Result: The agent returns a filtered list with permit age/open duration, contractor details, BBB rating when available, and clearly identifies any assumptions or missing data.
+- Presenter: “Finally, I will show that the system is MCP-ready.”
+  - Expected Result: The system demonstrates an MCP-ready interface or documented MCP-compatible query structure that agents and the roofing CRM can use without changing the data model.
 
 ## Out of Scope
-
-- Property, permit, ownership, or enrichment data collection and ingestion pipelines (separate story).
-- Live BBB API integration beyond displaying scores already present in available data.
-- Actual outbound messaging to property owners (can be mocked or deferred).
+- Roofing CRM UI, map pin/GPS interaction design, and lead outreach workflows (covered in [roofing-crm](https://github.com/prismteam-ai/roofing-crm)).
+- Live outbound messaging to property owners.
 
 ## Reference
-
+- [Roofing CRM & Lead Identification UI](https://github.com/prismteam-ai/roofing-crm)
 - [Soofi XYZ Team Kit](https://github.com/soofi-xyz/soofi-xyz-team-kit)
 - [Elephant Oracle Skills](https://github.com/elephant-xyz/skills)
