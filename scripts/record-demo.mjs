@@ -1,5 +1,5 @@
 import { chromium } from "@playwright/test";
-import { mkdir, rename, readdir } from "node:fs/promises";
+import { mkdir, rename, readdir, unlink } from "node:fs/promises";
 import { join } from "node:path";
 
 const base =
@@ -34,7 +34,7 @@ async function show(sel) {
 }
 
 await page.goto(base, { waitUntil: "load", timeout: 45000 });
-await page.locator("#run").waitFor({ timeout: 30000 });
+await page.locator("#run").waitFor({ state: "attached", timeout: 30000 });
 await page.waitForFunction(
   () => (document.getElementById("run")?.textContent || "").length > 80,
   null,
@@ -64,6 +64,7 @@ await say("Matching properties include roof-age basis, coordinates, and source p
 await say("Show properties in that area with open roofing permits that have remained open for many years, including contractor and BBB where available.");
 await page.uncheck("#aged").catch(() => {});
 await page.check("#open");
+await page.check("#longOpen").catch(() => {});
 await page.click("#query");
 await page.waitForTimeout(1500);
 await show("#table");
@@ -91,6 +92,8 @@ await browser.close();
 
 const files = (await readdir("demo/out")).filter((f) => f.endsWith(".webm") && !f.includes("transcript"));
 if (files[0]) {
-  await rename(join("demo/out", files[0]), join("demo/out", "oracle-demo-transcript.webm"));
+  const dest = join("demo/out", "oracle-demo-transcript.webm");
+  try { await unlink(dest); } catch {}
+  await rename(join("demo/out", files[0]), dest);
 }
 console.log("wrote demo/out/oracle-demo-transcript.webm from", base);
