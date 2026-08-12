@@ -6,8 +6,9 @@
 
 | Item | Location |
 |------|----------|
-| Live runtime | _pending hosted deploy_ (slowking requires a public URL, not localhost) |
-| Demo video | _pending hyperframes_ |
+| Live runtime | https://cc-bb-aa.github.io/oracle-property-intelligence-platform-pipeline-chester-county-pa/ |
+| Demo video | `demo/` (hyperframes source + Playwright recording) |
+| PR | https://github.com/prismteam-ai/oracle-property-intelligence-platform-pipeline-chester-county-pa/pull/2 |
 | Discovery | `docs/chester-pa-county-findings.md`, `docs/chester-pa-sources.yaml` |
 | AC matrix | `ACCEPTANCE.md` |
 

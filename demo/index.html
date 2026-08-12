@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Oracle Chester County demo</title>
+</head>
+<body>
+  <div
+    data-composition-id="oracle-chester-demo"
+    data-width="1920"
+    data-height="1080"
+    data-start="0"
+    data-duration="24"
+    data-track-index="0"
+  >
+    <style>
+      [data-composition-id="oracle-chester-demo"] {
+        background: #1c2b24;
+        color: #f4f1ea;
+        font-family: "Source Serif 4", Georgia, serif;
+      }
+      .scene-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 120px 160px;
+        gap: 24px;
+        box-sizing: border-box;
+      }
+      .kicker { font-family: "IBM Plex Mono", monospace; font-size: 28px; color: #d6f5c8; }
+      .title { font-size: 92px; line-height: 1.05; max-width: 1400px; }
+      .stat { font-family: "IBM Plex Mono", monospace; font-size: 36px; color: #c45c26; }
+    </style>
+    <div id="s1" class="scene-content">
+      <div class="kicker" id="s1k">PRISM HOMEWORK · ORACLE</div>
+      <div class="title" id="s1t">Chester County, PA property intelligence pipeline</div>
+      <div class="stat" id="s1s">PASDA parcels · DuckDB · MCP-ready · hosted runtime</div>
+    </div>
+    <div id="s2" class="scene-content">
+      <div class="kicker" id="s2k">DEMO TRANSCRIPT</div>
+      <div class="title" id="s2t">Run summary · aged roofs · long-open permits · agent · MCP</div>
+      <div class="stat" id="s2s">Live: GitHub Pages · real UPI coordinates</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.from("#s1k", { y: 30, opacity: 0, duration: 0.6, ease: "power3.out" }, 0.2);
+      tl.from("#s1t", { y: 50, opacity: 0, duration: 0.8, ease: "expo.out" }, 0.4);
+      tl.from("#s1s", { y: 20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0.7);
+      tl.from("#s2k", { x: -40, opacity: 0, duration: 0.5, ease: "power3.out" }, 12.2);
+      tl.from("#s2t", { y: 40, opacity: 0, duration: 0.7, ease: "expo.out" }, 12.5);
+      tl.from("#s2s", { y: 20, opacity: 0, duration: 0.5, ease: "sine.out" }, 12.9);
+      window.__timelines["oracle-chester-demo"] = tl;
+    </script>
+  </div>
+</body>
+</html>
